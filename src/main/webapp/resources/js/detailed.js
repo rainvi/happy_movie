@@ -136,11 +136,11 @@ $(document).ready(function() {
     /// Contents
     // person contents
     director.forEach(d => {
-        $("#director_table tr:nth-child(1)").append(`<td><img src='./images/profiles/${d.profile}'></td>`);
+        $("#director_table tr:nth-child(1)").append(`<td><img src='resources/images/profiles/${d.profile}'></td>`);
         $("#director_table tr:nth-child(2)").append(`<td>${d.name}</td>`);
     });
     actor.forEach(a => {
-        $("#actor_table tr:nth-child(1)").append(`<td><img src='./images/profiles/${a.profile}'></td>`);
+        $("#actor_table tr:nth-child(1)").append(`<td><img src='resources/images/profiles/${a.profile}'></td>`);
         $("#actor_table tr:nth-child(2)").append(`<td>${a.name}</td>`);
         $("#actor_table tr:nth-child(3)").append(`<td>${a.role} 역</td>`);
     });
@@ -186,7 +186,7 @@ $(document).ready(function() {
         let index = 0;
         let big_img = $(`#big_${photo_type}`);
         $(`#${photo_type}_more_title h3`).text(`1/${photo_arr.length}`);
-        big_img.attr("src", `./images/photos/${photo_type}/${photo_arr[index]}`);
+        big_img.attr("src", `resources/images/photos/${photo_type}/${photo_arr[index]}`);
 
         $(".prev_btn").on("click", function() {
             index = (index + photo_arr.length - 1) % photo_arr.length;

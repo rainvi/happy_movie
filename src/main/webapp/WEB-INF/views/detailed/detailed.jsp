@@ -25,7 +25,7 @@
 
     <img id="main_poster" src="resources/images/photos/posters/poster0.jfif">
     <div id="main">
-        <h1>슈퍼 마리오 브라더스</h1>
+        <h1>슈퍼 마리오 브라더스 ${ movie_id }</h1>
         <h3>The Super Mario Bros. Movie, 2023</h3>
         <table id="main_table">
             <tr>
