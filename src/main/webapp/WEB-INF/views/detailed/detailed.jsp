@@ -39,7 +39,6 @@
 	            	let showTm = movieData.showTm;	// 상영시간
 	            	let openDt = movieData.openDt;	// 개봉연도
 	            	let audits = movieData.audits[0].watchGradeNm;	// 심의정보
-	            	let companys = movieData.companys[0].companyNm;	// 제작사
 	            	
 	            	$("#detailed_title").text(movieNm + "ㅣHAPPYMOVIE");
 	            	$("#movieNm").text(movieNm);
@@ -47,7 +46,6 @@
 	            	$("#showTm").text(showTm + "분");
 	            	$("#openDt").text(openDt.substring(0, 4) + "." + openDt.substring(4, 6) + "." + openDt.substring(6, 8));
 	            	$("#audits").text(audits);
-	            	$("#companys").text(companys);
 	            	
 	            	// 리턴 타입 array O
 	            	// 제작국가
@@ -67,12 +65,42 @@
 	            	$("#genres").text(genres);
 	            	
 	            	// 감독
-	            	let directors = [];
-	            	for (let i = 0; i < movieData.directors.length; i++) {
-	            		directors.push(movieData.directors[i].peopleNm);
-	            	}
-	            	directors = directors.join(", ");
-	            	$("#directors").text(directors);
+	            	let directors = movieData.directors;
+	            	let directorsNm = [];
+	            	directors.forEach(d => {
+	            		// main info
+	            		directorsNm.push(d.peopleNm);
+	            		
+	            		// person contents
+	                    $("#director_table tr:nth-child(1)").append("<td><img src='resources/images/profiles/none_profile.png'></td>");
+	                    $("#director_table tr:nth-child(2)").append("<td>" + d.peopleNm + "</td>");
+	            	});
+	            	directorsNm = directorsNm.join(", ");
+	            	$("#directors").text(directorsNm);
+	            	
+	            	// 배우
+            		let actors = movieData.actors;
+	            	actors.forEach(a => {
+	            		// person contents
+	            		$("#actor_table tr:nth-child(1)").append("<td><img src='resources/images/profiles/none_profile.png'></td>");
+	            		$("#actor_table tr:nth-child(2)").append("<td>" + a.peopleNm + "</td>");
+	            		$("#actor_table tr:nth-child(3)").append("<td>" + a.cast + " 역</td>");
+	            	});
+	            	
+	            	// 제작진
+	            	let staffs = movieData.staffs;
+	            	staffs.forEach(s => {
+	            		// person contents
+	            		$("#crew_table").append("<tr><td>" + s.staffRoleNm + "</td><td>" + s.peopleNm + "</td></tr>");
+	            	});
+	            	
+	            	// 제작사
+	            	let companys = movieData.companys;
+	            	$("#companys").text(companys[0].companyNm);	// main info
+	            	companys.forEach(c => {
+	            		// person contents
+	            		$("#company_table").append("<tr><td>" + c.companyPartNm + "</td><td>" + c.companyNm + "</td></tr>");
+	            	});
 	            }	// success end
 	        });	// ajax end
 	        
@@ -142,7 +170,7 @@
 
     <div id="main_btns">
         <input id="info_btn" class="main_btns" type="button" data-target="#info_contents" data-end="1119" value="정보">
-        <input id="person_btn" class="main_btns" type="button" data-target="#person_contents" data-end="1645" value="인물">
+        <input id="person_btn" class="main_btns" type="button" data-target="#person_contents" data-end="1800" value="인물">
         <input id="photo_btn" class="main_btns" type="button" data-target="#photo_contents" data-end="1168" value="사진">
         <input id="grade_btn" class="main_btns" type="button" data-target="#grade_contents" value="평점">
     </div>
