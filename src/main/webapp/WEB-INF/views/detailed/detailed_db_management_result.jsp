@@ -5,17 +5,16 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>DetailedDBTest</title>
+	<title>DetailedDBManagementResult</title>
 	<script src="resources/js/jquery-3.6.4.min.js"></script>
+	<script src="resources/js/KobisOpenAPIRestService.js"></script>
 	<script>
 		$(document).ready(function() {
+
 		});
 	</script>
 </head>
 <body>
-	<h1>전체 회원 정보 (총 ${ usercount }명)</h1>
-	<c:forEach items="${ userlist }" var="dto" varStatus="vs">
-		[${ vs.count }] ${ dto.name }<br>
-	</c:forEach>
+	<h1>${ cnt }개 전송</h1>
 </body>
 </html>
