@@ -19,7 +19,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MovieTest</title>
+<title>DetailedAPITest</title>
 <script src="resources/js/jquery-3.6.4.min.js"></script>
 <script src="resources/js/KobisOpenAPIRestService.js"></script>
 <script>

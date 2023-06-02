@@ -34,8 +34,8 @@ public class DetailedController {
 		return mv;
 	}
 	
-	@RequestMapping("/detailedmovietest")
+	@RequestMapping("/detailedapitest")
 	public String detailedMovieTest() {
-		return "detailed/detailed_movietest";
+		return "detailed/detailed_api_test";
 	}
 }

@@ -5,7 +5,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>DetailedTest</title>
+	<title>DetailedDBTest</title>
 	<script src="resources/js/jquery-3.6.4.min.js"></script>
 	<script>
 		$(document).ready(function() {
