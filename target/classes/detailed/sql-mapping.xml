@@ -5,4 +5,13 @@
 	<select id="userList" resultType="userdto" >
 		select * from user_table
 	</select>
+	
+	<select id="oneMovie" parameterType="String" resultType="moviedto">
+		select * from movie_table where movie_id=#{movie_id}
+	</select>
+	
+	<insert id="insertBoxMovie" parameterType="moviedto">
+		insert into movie_table(movie_id, kor_title)
+		values(#{movie_id}, #{kor_title})
+	</insert>
 </mapper>

@@ -6,10 +6,103 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="resources/images/MainIcon.ico">
-    <title>슈퍼 마리오 브라더스ㅣHAPPYMOVIE</title>
     <link href="resources/css/detailed.css" rel=stylesheet>
     <script src="resources/js/jquery-3.6.4.min.js"></script>
+    <script src="resources/js/KobisOpenAPIRestService.js"></script>
+<!--     <script src="resources/js/detailed_api.js"></script> -->
     <script src="resources/js/detailed.js"></script>
+    <script>
+	    $(document).ready(function() {
+	        let key = "736697ae7e8ff21f7f31778b2d47a87d";
+	        let movieCd = ${ movie_id };
+	        
+	        // 어제 날짜
+	        let yesterday = new Date();
+	        yesterday.setDate(yesterday.getDate() - 1);
+	        let options = {
+	        		year: "numeric",
+	        		month: "2-digit",
+	        		day: "2-digit"
+	        };
+	        let targetDt = yesterday.toLocaleDateString('ko-KR', options).replace(/\./g, "").replace(/\s/g, "");
+		
+	        // 영화 상세 정보 API data load
+	        $.ajax({
+	            type: "get",
+	            url: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key=" + key + "&movieCd=" + movieCd,
+	            success: function(data) {
+	            	let movieData = data.movieInfoResult.movieInfo;
+	            	
+	            	// 리턴 타입 array X
+	            	let movieNm = movieData.movieNm; // 영화명(국문)
+	            	let movieNmEn = movieData.movieNmEn;	// 영화명(영문)
+	            	let showTm = movieData.showTm;	// 상영시간
+	            	let openDt = movieData.openDt;	// 개봉연도
+	            	let audits = movieData.audits[0].watchGradeNm;	// 심의정보
+	            	let companys = movieData.companys[0].companyNm;	// 제작사
+	            	
+	            	$("#detailed_title").text(movieNm + "ㅣHAPPYMOVIE");
+	            	$("#movieNm").text(movieNm);
+	            	$("#movieNmEn").text(movieNmEn + ", " + openDt.substring(0, 4));
+	            	$("#showTm").text(showTm + "분");
+	            	$("#openDt").text(openDt.substring(0, 4) + "." + openDt.substring(4, 6) + "." + openDt.substring(6, 8));
+	            	$("#audits").text(audits);
+	            	$("#companys").text(companys);
+	            	
+	            	// 리턴 타입 array O
+	            	// 제작국가
+	            	let nations = [];
+	            	for (let i = 0; i < movieData.nations.length; i++) {
+	            		nations.push(movieData.nations[i].nationNm);
+	            	}
+	            	nations = nations.join(", ");
+	            	$("#nations").text(nations);
+	            	
+	            	// 장르명
+	            	let genres = [];	// 장르
+	            	for (let i = 0; i < movieData.genres.length; i++) {
+	            		genres.push(movieData.genres[i].genreNm);
+	            	}
+	            	genres = genres.join("/");
+	            	$("#genres").text(genres);
+	            	
+	            	// 감독
+	            	let directors = [];
+	            	for (let i = 0; i < movieData.directors.length; i++) {
+	            		directors.push(movieData.directors[i].peopleNm);
+	            	}
+	            	directors = directors.join(", ");
+	            	$("#directors").text(directors);
+	            }	// success end
+	        });	// ajax end
+	        
+	        // 일별 박스오피스 순위 API data load
+	        $.ajax({
+	        	type: "get",
+	        	url: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=" + key + "&targetDt=" + targetDt,
+	        	success: function(data) {
+	        		let boxData = data.boxOfficeResult.dailyBoxOfficeList;
+	        		let rank, audiAcc;	// 순위, 누적관객수
+	        		for (let i = 0; i < boxData.length; i++) {
+	        			if (movieCd == boxData[i].movieCd) {
+	        				rank = boxData[i].rank;
+	        				audiAcc = boxData[i].audiAcc;
+	        				audiAcc = parseInt(audiAcc).toLocaleString("en-US");
+	        				
+	        				$("#main_table").append("<tr>"
+	        						+ "<th>박스오피스</th><td id='rank'><a href='rank'>"
+	        						+ rank + "위</a></td>"
+	        		                + "<th>누적관객</th><td>"
+	        		                + audiAcc +"명</td></tr>"
+	        				);
+	        				break;
+	        			}
+	        		}
+	        	}	// success end
+	        });	// ajax end
+	    });	// document end
+    </script>
+    <title id="detailed_title"></title>
 </head>
 <body>
     <header>
@@ -25,28 +118,24 @@
 
     <img id="main_poster" src="resources/images/photos/posters/poster0.jfif">
     <div id="main">
-        <h1>슈퍼 마리오 브라더스 ${ movie_id }</h1>
-        <h3>The Super Mario Bros. Movie, 2023</h3>
+        <h1 id="movieNm"></h1>
+        <h3 id="movieNmEn"></h3>
         <table id="main_table">
             <tr>
-                <th>개봉</th><td>2023.04.26</td>
-                <th>평점</th><td id="main_grade">★8.4</td>
+                <th>개봉</th><td id="openDt"></td>
+                <th>평점</th><td id="main_grade"></td>
             </tr>
             <tr>
-                <th>장르</th><td>애니메이션/어드벤처/코미디</td>
-                <th>누적관객</th><td>1,018,350명</td>
+                <th>장르</th><td id="genres"></td>
+                <th>국가</th><td id="nations"></td>
             </tr>
             <tr>
-                <th>국가</th><td>미국, 일본</td>
-                <th>박스오피스</th><td id="go_rank" onclick="location.href = 'rank'">2위</td>
+                <th>등급</th><td id="audits"></td>
+                <th>러닝타임</th><td id="showTm"></td>
             </tr>
             <tr>
-                <th>등급</th><td>전체관람가</td>
-                <th>러닝타임</th><td>92분</td>
-            </tr>
-            <tr>
-                <th>감독</th><td>아론 호바스, 마이클 젤레닉</td>
-                <th>제작사</th><td>유니버설 픽쳐스</td>
+                <th>감독</th><td id="directors"></td>
+                <th>제작사</th><td id="companys"></td>
             </tr>
         </table>
     </div>

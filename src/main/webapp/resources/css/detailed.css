@@ -106,23 +106,20 @@ header {
 }
 #main table {
     margin-top: 40px;
-    height: 160px;
     font-size: 20px;
 }
 #main th {
     text-align: left;
+    height: 30px;
     width: 120px;
     color: #5F5F5F;
 }
 #main td {
-    width: 300px;
+    width: 400px;
     color: white;
 }
-#go_rank {
-    cursor: pointer;
-}
-#go_rank:hover {
-    text-decoration: underline;
+#main a {
+	color: white;
 }
 
 /* main buttons */
