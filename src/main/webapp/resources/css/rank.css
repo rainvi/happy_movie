@@ -138,16 +138,7 @@ td{
     top:40px;
     padding: 25px 0 20px 0;
 }
-.num_wrap{
-    display:table;
-    table-layout: fixed;
-    height: 50px;
-    width:300px;
-    line-height: 50px;
-    margin: 0 auto;
-    text-align: center;
-    
-}
+
 .num{
     margin:0 7px;
     cursor: pointer;
@@ -303,10 +294,43 @@ strong{
     z-index: 1;
     border-radius: 16px;
 }
+.num_div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; 
+    margin-top: 20px;
+    margin-bottom: -20px;
+    font-size: 20px;
+}
+
+.num_wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
 .num_wrap span{
-    display: table-cell;
-    width: 100px;
+    cursor:pointer;
 }
 .genre_text{
     padding: 0 10px;
 }
+nav{
+    display:none;
+}
+button{
+    padding: 0 10px;
+    border: 0px solid black;
+    cursor: pointer;
+    background-color: transparent;
+    -webkit-appearance: none;
+    font-size: 20px;
+    background-color: transparent;
+    color:white;
+}
+.genre_text .color{
+    color:#892CDC;
+}
+
+

@@ -1,5 +1,9 @@
+<%@page import="rank.ApiSearch"%>
+<%@page import="rank.movieList"%>
+<%@page import="java.util.Comparator"%>
+<%@page import="java.util.Collections"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.LinkedHashMap"%>
-<%@page import="rank.searchImg"%>
 <%@page import="com.fasterxml.jackson.databind.ObjectMapper"%>
 <%@page import="kr.or.kobis.kobisopenapi.consumer.rest.KobisOpenAPIRestService"%>
 <%@page import="java.util.Map"%>
@@ -11,7 +15,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<% 
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%
 	String targetDt = request.getParameter("targetDt")==null?"20230530":request.getParameter("targetDt");			//조회일자
 	String itemPerPage = request.getParameter("itemPerPage")==null?"10":request.getParameter("itemPerPage");		//결과row수
 	String multiMovieYn = request.getParameter("multiMovieYn")==null?"":request.getParameter("multiMovieYn");		//“Y” : 다양성 영화 “N” : 상업영화 (default : 전체)
@@ -20,15 +25,18 @@
 	String curPage = request.getParameter("curPage")==null?"1":request.getParameter("curPage");					//현재페이지
 	String movieNm = request.getParameter("movieNm")==null?"":request.getParameter("movieNm");						//영화명
 	String directorNm = request.getParameter("directorNm")==null?"":request.getParameter("directorNm");				//감독명
-	String openStartDt = request.getParameter("openStartDt")==null?"":request.getParameter("openStartDt");			//개봉연도 시작조건 ( YYYY )
-	String openEndDt = request.getParameter("openEndDt")==null?"":request.getParameter("openEndDt");				//개봉연도 끝조건 ( YYYY )	
+	String openStartDt = request.getParameter("openStartDt")==null?"2020":request.getParameter("openStartDt");			//개봉연도 시작조건 ( YYYY )
+	String openEndDt = request.getParameter("openEndDt")==null?"2022":request.getParameter("openEndDt");				//개봉연도 끝조건 ( YYYY )	
 	String prdtStartYear = request.getParameter("prdtStartYear")==null?"":request.getParameter("prdtStartYear");	//제작연도 시작조건 ( YYYY )
 	String prdtEndYear = request.getParameter("prdtEndYear")==null?"":request.getParameter("prdtEndYear");			//제작연도 끝조건    ( YYYY )
 	String[] movieTypeCdArr = request.getParameterValues("movieTypeCdArr")==null? null:request.getParameterValues("movieTypeCdArr");	//영화형태코드 배열 (공통코드서비스에서 '2201'로 조회된 영화형태코드)
 	String genreNm = request.getParameter("genreNm")==null?"없음":request.getParameter("genreNm");
-	
-	// 발급키
-	String key = "bf2271f675c761c477ce7afc3b47bee1";
+	String genre_text = request.getParameter("genre_text") == null?"액션":request.getParameter("genre_text");
+
+	request.setAttribute("genre_text", genre_text);
+	// 발급키 3000회 제한
+	/* String key = "bf2271f675c761c477ce7afc3b47bee1"; */
+	String key = "478bf317e87507fd04843638f4a1ea4a";
 	// KOBIS 오픈 API Rest Client를 통해 호출
     KobisOpenAPIRestService service = new KobisOpenAPIRestService(key);
 	
@@ -45,7 +53,7 @@
 	
 	HashMap<String,Object> result = mapper.readValue(movieCdResponse, HashMap.class);
 	request.setAttribute("result",result);
-
+/* 	System.out.println(result); */
 	// KOBIS 오픈 API Rest Client를 통해 코드 서비스 호출 (boolean isJson, String comCode )
 	String codeResponse = service.getComCodeList(true,"0105000000");
 	HashMap<String,Object> codeResult = mapper.readValue(codeResponse, HashMap.class);
@@ -68,16 +76,15 @@
 	<meta name="referrer" content="no-referrer" />
 	<title>RANK | HAPPYMOVIE</title>
 	<link href = "resources/images/MainIcon.ico" rel = "shortcut icon">
-	<link href = "resources/css/rank.css" rel = "stylesheet">
+	<link href = "resources/css/rank.css?v=2" rel = "stylesheet">
 	<script src="resources/js/jquery-3.6.4.min.js"></script>
 	<script>
 		$(document).ready(function() {
-			
+		
 		});
 	</script>
 	<script type="text/javascript">
-	<%
-		String movieTypeCds = "[";
+	<%String movieTypeCds = "[";
 		if(movieTypeCdArr!=null){
 			for(int i=0;i<movieTypeCdArr.length;i++){
 				movieTypeCds += "'"+movieTypeCdArr[i]+"'";
@@ -85,8 +92,7 @@
 					movieTypeCds += ",";
 				}
 			}
-			movieTypeCds += "]";
-	%>
+			movieTypeCds += "]";%>
 	
 	$(function(){
 		var movieTypeCd = <%=movieTypeCds%>;
@@ -95,89 +101,12 @@
 		});
 	});
 	
-	<%
-		}
-	%>
+	<%}%>
 	</script>
 </head>
 <body>
-<%-- <%=dailyResult %><br>
-<%=targetDt %><br> --%>
-
-<%-- <table border="1">
-		<tr>
-			<td>순위</td><td>영화명</td><td>개봉일</td><td>매출액</td><td>매출액점유율</td><td>매출액증감(전일대비)</td>
-			<td>누적매출액</td><td>관객수</td><td>관객수증감(전일대비)</td><td>누적관객수</td><td>스크린수</td><td>상영횟수</td>
-		</tr>
-	<c:if test="${not empty dailyResult.boxOfficeResult.dailyBoxOfficeList}">
-	<c:forEach items="${dailyResult.boxOfficeResult.dailyBoxOfficeList}" var="boxoffice">
-		<tr>
-			<td><c:out value="${boxoffice.rank }"/></td><td><c:out value="${boxoffice.movieNm }"/></td><td><c:out value="${boxoffice.openDt }"/></td><td><c:out value="${boxoffice.salesAmt }"/></td>
-			<td><c:out value="${boxoffice.salesShare }"/></td><td><c:out value="${boxoffice.salesInten }"/>/<c:out value="${boxoffice.salesChange }"/></td><td><c:out value="${boxoffice.salesAcc }"/></td><td><c:out value="${boxoffice.audiCnt }"/></td>
-			<td><c:out value="${boxoffice.audiInten }"/>/<c:out value="${boxoffice.audiChange }"/></td><td><c:out value="${boxoffice.audiAcc }"/></td><td><c:out value="${boxoffice.scrnCnt }"/></td>
-			<td><c:out value="${boxoffice.showCnt }"/></td>
-		</tr>
-	</c:forEach>
-	</c:if>
-</table>
-<form action="">
-		일자:<input type="text" name="targetDt" value="<%=targetDt %>">
-		최대 출력갯수:<input type="text" name="itemPerPage" value="<%=itemPerPage %>">
-		국적:<select name="repNationCd">
-			<option value="">-전체-</option>
-			<option value="K"<c:if test="${param.repNationCd eq 'K'}"> selected="seleted"</c:if>>한국</option>
-			<option value="F"<c:if test="${param.repNationCd eq 'F'}"> selected="seleted"</c:if>>외국</option>
-			</select>
-			<input type="submit" name="" value="조회">
-</form>	 --%>
-
-
-
-<%-- 	<c:out value="${result.movieListResult.totCnt}"/>
-	<table border="1">
-		<tr>
-			<td>영화명</td><td>영화명(영)</td><td>제작연도</td><td>개봉연도</td><td>제작국가</td><td>감독</td><td>장르</td>
-			<td>참여영화사</td>
-		</tr>
-	<c:if test="${not empty result.movieListResult.movieList}">
-	<c:forEach items="${result.movieListResult.movieList}" var="movie">
-		<c:set var="movieCd" value="${movie.movieCd}" />
-		<% String moviegenre = service.getMovieInfo(true, (String) pageContext.getAttribute("movieCd")); 
-			HashMap<String,Object> result2 = mapper.readValue(moviegenre, HashMap.class);
-			request.setAttribute("result2",result2);
-		%>
-		<tr>
-			<td><c:out value="${movie.movieNm }"/></td><td><c:out value="${movie.movieNmEn }"/></td><td><c:out value="${movie.prdtYear }"/></td><td><c:out value="${movie.openDt }"/></td>
-			<td><c:out value="${movie.repNationNm}"/></td><td><c:forEach items="${movie.directors}" var="director"><c:out value="${director.peopleNm}"/>,</c:forEach></td>
-			<td><c:forEach items="${movie.companys}" var="company"><c:out value="${company.companyNm}"/>,</c:forEach></td>
-			<td><c:forEach items="${result2.movieInfoResult.movieInfo.genres }" var="genre"><c:out value="${genre.genreNm}"/>,</c:forEach></td>
-			<td><c:out value="${result2.movieInfoResult.movieInfo.genres }"/></td>	
-		</tr>		
-	</c:forEach>
-	</c:if>
-<form action="">
-		현재페이지 :<input type="text" name="curPage" value="<%=curPage %>">
-		최대 출력갯수:<input type="text" name="itemPerPage" value="<%=itemPerPage %>">
-		감독명:<input type="text" name="directorNm" value="<%=directorNm %>">		
-		영화명:<input type="text" name="movieNm" value="<%=movieNm %>"> <br/>
-		개봉연도조건:<input type="text" name="openStartDt" value="<%=openStartDt %>"> ~ <input type="text" name="openEndDt" value="<%=openEndDt %>">
-		제작연도조건:<input type="text" name="prdtStartYear" value="<%=prdtStartYear %>"> ~ <input type="text" name="prdtEndYear" value="<%=prdtEndYear %>">		
-
-		국적:<select name="repNationCd">
-			<option value="">-전체-</option>
-			<c:forEach items="${nationCd.codes}" var="code">
-			<option value="<c:out value="${code.fullCd}"/>"<c:if test="${param.repNationCd eq code.fullCd}"> selected="seleted"</c:if>><c:out value="${code.korNm}"/></option>
-			</c:forEach>
-			</select><br/>
-		영화형태:
-			<c:forEach items="${movieTypeCd.codes}" var="code" varStatus="status">
-			<input type="checkbox" name="movieTypeCdArr" value="<c:out value="${code.fullCd}"/>" id="movieTpCd_<c:out value="${code.fullCd}"/>"/> <label for="movieTpCd_<c:out value="${code.fullCd}"/>"><c:out value="${code.korNm}"/></label>
-			<c:if test="${status.count %4 eq 0}"><br/></c:if>
-			</c:forEach>
-			<br/>
-		<input type="submit" name="" value="조회">
-	</form>
-</table> --%>
+	<%movieList movielist = new movieList(); %>
+	
 
 <header class="top"> 
     <div class="main_logo">
@@ -191,27 +120,41 @@
         <input type="text" placeholder="영화 제목" class = 'search_input'/>
         <a href="search.html"><img src="resources/images/searchIcon.svg" /></a> 
     </div>
-<% searchImg img = new searchImg(); %>
+<%
+ApiSearch apiSearch = new ApiSearch();
 
+%>
 </header>
     <div class="wrap"> 
         <div class="choice">
             <span id="reservation" class="link purple">애매율순 </span>| <span id="grade" class="link">평점순</span> | <span id="genre" class="link">장르별</span>
         </div>
         <div class="genre_choice">
-            <span id="action" class="genre_text">액션</span>
-            <span id="comedy" class="genre_text">코미디</span>
-            <span id="thriller" class="genre_text">스릴러</span>
-            <span id="romance" class="genre_text">로맨스</span>
+		<%-- 영화명:<input type="text" name="movieNm" value="<%=movieNm %>"> <br/>
+		개봉연도조건:<input type="text" name="openStartDt" value="<%=openStartDt %>"> ~ <input type="text" name="openEndDt" value="<%=openEndDt %>">
+		제작연도조건:<input type="text" name="prdtStartYear" value="<%=prdtStartYear %>"> ~ <input type="text" name="prdtEndYear" value="<%=prdtEndYear %>"> --%>		
+		<%-- 영화형태:
+			<c:forEach items="${movieTypeCd.codes}" var="code" varStatus="status">
+			<input type="checkbox" name="movieTypeCdArr" value="<c:out value="${code.fullCd}"/>" id="movieTpCd_<c:out value="${code.fullCd}"/>"/> <label for="movieTpCd_<c:out value="${code.fullCd}"/>"><c:out value="${code.korNm}"/></label>
+			<c:if test="${status.count %4 eq 0}"><br/></c:if>
+			</c:forEach>
+			<br/> --%>
+            <span id="action" class="genre_text" >액션</span>
+            <span id="comedy" class="genre_text" >코미디</span>
+            <span id="thriller" class="genre_text" >스릴러</span>
+            <span id="romance" class="genre_text" >로맨스</span>
             <span id="fantasy" class="genre_text">판타지</span>
-        </div>
+		</div>
+        
         
         <div class="content">
         	<table class="reservation active table"> 
         	<tr>
+        	<% ArrayList totalArray = new ArrayList(); %>
         		<c:if test="${not empty dailyResult.boxOfficeResult.dailyBoxOfficeList}">
 					<c:forEach items="${dailyResult.boxOfficeResult.dailyBoxOfficeList}" var="boxoffice" begin="0" end="4">
 					<%HashMap boxOfficeMap = (HashMap) pageContext.getAttribute("boxoffice"); %>
+					
 					<%-- <%= img.searchContent((String)boxOfficeMap.get("movieNm")) %> --%>
 							<td>
 								<div class="rank">
@@ -219,266 +162,114 @@
 								</div>
 								<div class='inner_wrap'>
 		                            <div class="inner_text">
-		                                <span class="back"> ‘가모라’를 잃고 슬픔에 빠져 있던 ‘피터 퀼’이 위기에 처한 은하계와 동료를 지키기 위해 다시 한번 가디언즈 팀과 힘을 모으고, 성공하지 못할 경우 그들의 마지막이 될지도 모르는 미션에 나서는 이야기</span>
+		                            <%String contents = apiSearch.searchContent((String)boxOfficeMap.get("movieNm")); %>
+		                                <span class="back"> <%=contents%></span>
 		                            </div>
 		                        </div> 
 		                        <div class='img_wrap'>
-		                        		<img referrerpolicy="no-referrer" src="<%=img.imgurl((String)boxOfficeMap.get("movieNm"))%>" alt="영화포스터" class="img">
+		                        <%String img_url = apiSearch.imgurl((String)boxOfficeMap.get("movieNm")); %>
+		                        		<img referrerpolicy="no-referrer" src="<%=img_url%>" alt="영화포스터" class="img">
 		                        </div>
 		                        <h3><c:out value="${boxoffice.movieNm }"/></h3>
-		                        <p>평점 <span class='score'>9.0</span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
+		                        <%String grade =apiSearch.searchGrade((String)boxOfficeMap.get("movieNm"));  %>
+		                        <%boxOfficeMap.put("grade", grade); %>
+		                        <%boxOfficeMap.put("imgurl", img_url); %>
+		                        <%boxOfficeMap.put("contents", contents); %>
+		                        <p>평점 <span class='score'><%=grade%></span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
 		                        <p>개봉 <c:out value="${boxoffice.openDt }"/></p>
 							</td>
+							<%totalArray.add(boxOfficeMap); %>
 					</c:forEach>
 				</c:if>
         	</tr>
+
         	<tr>
+        	
         		<c:if test="${not empty dailyResult.boxOfficeResult.dailyBoxOfficeList}">
 					<c:forEach items="${dailyResult.boxOfficeResult.dailyBoxOfficeList}" var="boxoffice" begin="5" end="10">
 					<%HashMap boxOfficeMap = (HashMap) pageContext.getAttribute("boxoffice"); %>
-
 							<td>
 								<div class="rank">
 									<c:out value="${boxoffice.rank }"/>
 								</div>
 								<div class='inner_wrap'>
 		                            <div class="inner_text">
-		                                <span class="back"> ‘가모라’를 잃고 슬픔에 빠져 있던 ‘피터 퀼’이 위기에 처한 은하계와 동료를 지키기 위해 다시 한번 가디언즈 팀과 힘을 모으고, 성공하지 못할 경우 그들의 마지막이 될지도 모르는 미션에 나서는 이야기</span>
+		                                <%String contents = apiSearch.searchContent((String)boxOfficeMap.get("movieNm")); %>
+		                                <span class="back"> <%=contents%></span>
 		                            </div>
 		                        </div> 
 		                        <div class='img_wrap'>
-		                                <img referrerpolicy="no-referrer" src="<%=img.imgurl((String)boxOfficeMap.get("movieNm"))%>" alt="영화포스터" class="img">
+		                        <%String img_url = apiSearch.imgurl((String)boxOfficeMap.get("movieNm")); %>
+		                                <img referrerpolicy="no-referrer" src="<%=img_url%>" alt="영화포스터" class="img">
 		                        </div>
 		                        <h3><c:out value="${boxoffice.movieNm }"/></h3>
-		                        <p>평점 <span class='score'>9.0</span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
+		                        <%String grade =apiSearch.searchGrade((String)boxOfficeMap.get("movieNm"));  %>
+		                        <%boxOfficeMap.put("grade", grade); %>
+		                        <%boxOfficeMap.put("imgurl", img_url); %>
+		                        <%boxOfficeMap.put("contents", contents); %>
+		                        <p>평점 <span class='score'><%=grade%></span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
 		                        <p>개봉 <c:out value="${boxoffice.openDt }"/></p>
 							</td>
+							<%totalArray.add(boxOfficeMap); %>
 					</c:forEach>
 				</c:if>
         	</tr>
+        	<%Collections.sort(totalArray, new Comparator<Map<String, Object>>() {
+        	    public int compare(Map<String, Object> m1, Map<String, Object> m2) {
+        	        Double grade1 = Double.parseDouble((String) m1.get("grade"));
+        	        Double grade2 = Double.parseDouble((String) m2.get("grade"));
+        	        return grade2.compareTo(grade1); // Descending order
+        	        // Use the following for ascending order
+        	        // return grade1.compareTo(grade2); 
+        	    }
+        	}); %>
+			<%request.setAttribute("totalArray", totalArray); %>
         	</table>
             <table class="grade table">
-                <tr>
-                    <td>
-                        <div class="rank">1</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">"하나님. 조금만 더 살게 해주세요..." 
-                            행복한 나날을 보내던 세 가정에 청천벽력처럼 찾아온 암 소식. 
-                            누군가의 남편이자 아내 그리고 누군가의 부모인 세 엄마는 
-                            죽음에 대한 두려움 보다 남은 가족들에 대한 걱정만 가득하다. </span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F4d92b5863d23b1bc285e24db15dd5b83aa8f9045" alt="영화포스터" class="img"></div>
-                        <h3>울지마 엄마 </h3>
-                        <p>평점 <span class='score'>9.7</span> 예매율 0.3%</p>
-                        <p>개봉 23.05.17</p>   
-                    </td>
-                    <td>
-                        <div class="rank">2</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">‘가모라’를 잃고 슬픔에 빠져 있던 ‘피터 퀼’이 위기에 처한 은하계와 동료를 지키기 위해 다시 한번 가디언즈 팀과 힘을 모으고, 성공하지 못할 경우 그들의 마지막이 될지도 모르는 미션에 나서는 이야기</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F6b0eb68a4c944965ae78c83112bbb799c25b876b" alt="영화포스터" class="img"></div>
-                        <h3>가디언즈 오브 갤럭시: Volume 3</h3>
-                        <p>평점 <span class='score'>9.0</span> 예매율 39.4%</p>
-                        <p>개봉 23.04.26</p>
-                    </td>
-                    <td>
-    
-                        <div class="rank">3</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">사실... 짱구는 닌자 가문의 후계자였다?! 
-                            어느 날 ‘짱구‘와 동갑내기인 5살 ‘진구’를 데리고, 짱구 가족을 찾아온 수상한 여성. 
-                            서로의 아이가 바뀌었다는 충격적인 소식을 전한다.</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2Feb9b444c3e82c4694207422a4e9304a27cc95a6d" alt="영화포스터" class="img"></div>
-                        <h3>극장판 짱구는 못말려: 동물소환 닌자 배꼽수비대</h3>
-                        <p>평점 <span class='score'>8.9</span> 예매율 8.4%</p>
-                        <p>개봉 23.04.26</p>
-                    </td>
-                    <td>
-                        <div class="rank">4</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">농구선수 출신 공익근무요원 ‘양현’은 
-                            해체 위기에 놓인 부산중앙고 농구부의 신임 코치로 발탁된다. 
-                            하지만 전국대회에서의 첫 경기 상대는 고교농구 최강자 용산고. 
-                            팀워크가 무너진 중앙고는 몰수패라는 치욕의 결과를 낳고 </span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F541382b0a4105163dc37e4aba7d44e8c115b72d6" alt="영화포스터" class="img"></div>
-                        <h3>리바운드</h3>
-                        <p>평점 <span class='score'>8.9</span> 예매율 0.2%</p>
-                        <p>개봉 23.04.05</p> 
-                    </td>
-                    <td>
-                        <div class="rank">5</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">은퇴만 남은 신기록 보유자 ‘현수’ 
-                            최고의 자리를 잃을까 두려운 ‘정호’ 
-                            유망주였지만 팀 해체 위기에 놓인 ‘준서’ 
-                            그래도, 계속 달려야 하니까.
-                            제자리에. 차렷. GO!.</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F9e59825786f828b9afc151e1afcdedb3b3c9d8a2" alt="영화포스터" class="img"></div>
-                        <h3>스프린터</h3>
-                        <p>평점 <span class='score'>8.7</span> 예매율 0.1%</p>
-                        <p>개봉 23.05.24</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="rank">6</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">따단-딴-따단-딴 ♫ 
-                            전 세계를 열광시킬 올 타임 슈퍼 어드벤처의 등장! 
-                            뉴욕의 평범한 배관공 형제 '마리오'와 ‘루이지’는
-                            배수관 고장으로 위기에 빠진 도시를 구하려다
-                            미스터리한 초록색 파이프 안으로 빨려 들어가게 된다.</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F8876ecefc861afc397a9943ab781bdf0316c4983" alt="영화포스터" class="img"></div>
-                        <h3>슈퍼 마리오 브라더스</h3>
-                        <p>평점 <span class='score'>8.5</span> 예매율 22.9%</p>
-                        <p>개봉 23.05.03</p>
-        
-                    </td>
-                    <td>
-                        <div class="rank">7</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">완벽히 숨기고, 끝까지 의심할 것 
-                            1941년 일본은 진주만을 기습 공격하고, 상하이를 점령한다.   
-                            이에 맞서 상하이에서는 비밀 결사가 결성되고,
-                            정체를 감춘 채 일본 조직 내 침투한 요원들은</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2Fcda9be2bbd98deecf05d142c0f187ff7ce0cd11c" alt="영화포스터" class="img"></div>
-                        <h3>무명</h3>
-                        <p>평점 <span class='score'>7.9</span> 예매율 0.7%</p>
-                        <p>개봉 23.04.26</p>
-                    </td>
-                    <td>
-                        <div class="rank">8</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">“국가를… 대표하시는 분들이구나…” 
-                            선수 생활 사상 최악의 위기를 맞은 쏘울리스 축구 선수 홍대(박서준) 
-                            계획도, 의지도 없던 홈리스 풋볼 월드컵 감독으로 재능기부에 나서게 된다</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2Feb514ac276500897a26a8e979b130571586021b5" alt="영화포스터" class="img"></div>
-                        <h3>드림</h3>
-                        <p>평점 <span class='score'>7.8</span> 예매율 5.4%</p>
-                        <p>개봉 23.04.26</p>
-                    </td>
-                    <td>
-                        <div class="rank">9</div>
-                        <div class='inner_wrap'><div class="inner_text"><span class="back">“5년 만나는 동안 이렇게 떨어져 본 적 있나?” 
-                            외제차 딜러인 ‘도하’와 인디밴드 ‘연신굽신’의 메인 보컬 ‘태인’은  
-                            5년 차 달달 커플이다. 서른을 앞두고, 밴드 활동에 위기가 찾아오자 </span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F91333bbb7eef82397a826d95f9a5f5bc1c205837" alt="영화포스터" class="img"></div>
-                        <h3>롱디</h3>
-                        <p>평점 <span class='score'>7.8</span> 예매율 1.3%</p>
-                        <p>개봉 23.05.10</p>
-                    </td>
-                    <td>
-                        <div class="rank">10</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">모두가 알지만 누구도 한 단어로 정의하지 못한 사람 
-                                그래서 자꾸만 더 알고 싶은 사람, 마침내 이해하고 싶은 사람 
-                                전직 대통령, 현직 평산마을 주민, 어디서도 볼 수 없었던 ‘사람 문재인’의 이야기 </span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F7d2892c758240006ffb4c0ba3e91ded61223e0a7" alt="영화포스터" class="img"></div>
-                        <h3>문재인입니다</h3>
-                        <p>평점 <span class='score'>7.6</span> 예매율 0.9%</p>
-                        <p>개봉 23.05.10</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="rank">11</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">아무리 빨리 달려도 과거를 앞지를 순 없다 
-                                돔(빈 디젤)과 그의 패밀리 앞에 나타난 운명의 적 단테(제이슨 모모아). 
-                                과거의 그림자는 돔의 모든 것을 파괴하기 위해 달려온다.</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F6fed61e73b455aba36c3c4b434b6fafe2944e698" alt="영화포스터" class="img"></div>
-                        <h3>분노의 질주: 라이드 오어 다이</h3>
-                        <p>평점 <span class='score'>7.5</span> 예매율 3.0%</p>
-                        <p>개봉 23.05.17</p>
-                    </td>
-                    <td>
-                        <div class="rank">12</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">죽을 위기에서 살아난 ‘존 윅’은 
-                                ‘최고 회의’를 쓰러트릴 방법을 찾아낸다.
-                                비로소 완전한 자유의 희망을 보지만, NEW 빌런 ‘그라몽 후작’과 전 세계의 최강 연합은 
-                                ‘존 윅’의 오랜 친구까지 적으로 만들어 버리고,</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F5605612b56736f1b4dedc8953b29b5d04c32c053" alt="영화포스터" class="img"></div>
-                        <h3>존 윅 4</h3>
-                        <p>평점 <span class='score'>7.5</span> 예매율 2.3%</p>
-                        <p>개봉 23.04.12</p>
-                    </td>
-                    <td>
-                        <div class="rank">13</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">서로가 세상의 전부였던 레오와 레미는 친구들에게 관계를 의심받기 시작한다. 
-                                이후 낯선 시선이 두려워진 레오는 레미와 거리를 두고, 
-                                홀로 남겨진 레미는 걷잡을 수 없는 감정에 빠져들고 만다. </span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2Ffeb0710eb68b1e099ea6ba9db23def9961c8bb22" alt="영화포스터" class="img"></div>
-                        <h3>클로즈</h3>
-                        <p>평점 <span class='score'>7.4</span> 예매율 0.2%</p>
-                        <p>개봉 23.05.03</p>
-                    </td>
-                    <td>
-                        <div class="rank">14</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">“이 근처에 폐허 없니? 문을 찾고 있어” 
-                                규슈의 한적한 마을에 살고 있는 소녀 ‘스즈메’는 
-                                문을 찾아 여행 중인 청년 ‘소타’를 만난다. 그의 뒤를 쫓아 산속 폐허에서 발견한 낡은 문.  </span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F3a684ccaeb7aeac8e3f060ffe7249f7fe039443a" alt="영화포스터" class="img"></div>
-                        <h3>스즈메의 문단속</h3>
-                        <p>평점 <span class='score'>7.3</span> 예매율 4.6%</p>
-                        <p>개봉 23.03.08</p>
-                    </td>
-                    <td>
-                        <div class="rank">15</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">제니로 인해 미스틱 마을에 살던 열쇠티니핑들이 하모니 마을로 오게 되고, 마스터키로 마을을 장악한 제니와 다해핑을 피해 로열티니핑들（나나핑, 꾸래핑, 솔찌핑）은 도망쳐 게이트를 건너게 되면서 로미와 하츄핑을 만나게 된다. 그리고 그때 알 수 없는 정체의 상자도 함께 하모니 마을로 떨어진다.</span></div></div>
-                        <div class='img_wrap'><img src="https://img.cgv.co.kr/Movie/Thumbnail/Poster/000086/86985/86985_320.jpg" alt="영화포스터" class="img"></div>
-                        <h3>뮤지컬 공연실황, 알쏭달쏭 캐치! 티니핑</h3>
-                        <p>평점 <span class='score'>7.2</span> 예매율 0.5%</p>
-                        <p>개봉 23.05.03</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="rank">16</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">산 사람은 붉게 귀신은 파랗게, 
-                                모든 것이 생중계 된다! 
-                                한 BJ가 남긴 기괴한 영상의 진위를 밝히겠다며 한 폐건물로 모인 5명의 스트리머들.
-                                각자 라이브 방송을 진행하며 건물을 살펴보던 그들의 섬뜩하고 소름 끼치는 현장은 그야말로 리얼하게 생중계 되는데…</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F58b7c6d55338446e38bb12bb3e7730ad433494a5" alt="영화포스터" class="img"></div>
-                        <h3>스트리머</h3>
-                        <p>평점 <span class='score'>6.8</span> 예매율 0.1%</p>
-                        <p>개봉 23.05.10</p>
-                    </td>
-                    <td>
-                        <div class="rank">17</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">로맨스는 없다! 
-                                JOHN NA 죽여주는 작전만 있을 뿐!
-                                대재앙 같은 발연기로 국민 조롱거리로 전락한 톱스타 ‘여래’(이하늬).
-                                현실에서 벗어나고자 떠난 남태평양 ‘콸라’섬에서 운명처럼 자신을 구해준 재벌 ‘조나단’(이선균)을 만나 결혼을 하고 새로운
-                                인생을 꿈꾸며 돌연 은퇴를 선언한다.</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2Fbe239fd29a9a82847e419e4c0d0490a6ca8dd7e4" alt="영화포스터" class="img"></div>
-                        <h3>킬링 로맨스</h3>
-                        <p>평점 <span class='score'>6.3</span> 예매율 0.2%</p>
-                        <p>개봉 23.04.14</p>        
-                    </td>
-                    <td>
-                        <div class="rank">18</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">특종이 필요한 기자 ‘나영’은 옥수역에서 근무하는 친구 ‘우원’을 통해 
-                                ‘옥수역’에서 계속해서 일어난 사망사건들을 듣게 된다.
-                                ‘나영’은 ‘우원’과 함께 취재를 시작하고 그녀에게 계속 괴이한 일들이 벌어지는데…</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2Ffd6105e7d4919af308749f5785eee564320dfada" alt="영화포스터" class="img"></div>
-                        <h3>옥수역귀신</h3>
-                        <p>평점 <span class='score'>6.2</span> 예매율 0.5%</p>
-                        <p>개봉 23.04.19</p>
-                        
-                    </td>
-                    <td>
-                        <div class="rank">19</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">‘붉은 봉투를 줍는 자, 운명을 거스를 수 없다!'
-                                혈기왕성한 형사 우밍한은 중요한 사건 현장에서 도로에 흩어진 증거물을 수집하던 중
-                                의문의 붉은 봉투를 발견하고 무심코 줍는다.</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2Fac5ff408f9c93a74e8613c1fdfba1dadd8adca9b" alt="영화포스터" class="img"></div>
-                        <h3>메리 마이 데드 바디</h3>
-                        <p>평점 <span class='score'>5.5</span> 예매율 1.0%</p>
-                        <p>개봉 23.05.17</p>
-                    </td>
-                    <td>
-                        <div class="rank">20</div>
-                            <div class='inner_wrap'><div class="inner_text"><span class="back">인류 생존을 위한 
-                                마지막 프로젝트의 서막!      
-                                태양계 소멸의 위기를 맞은 인류는 
-                                지구 표면에 거대한 엔진을 달아 궤도를 옮기는
-                                ‘유랑지구 프로젝트’에 돌입한다.</span></div></div>
-                        <div class='img_wrap'><img src="https://img1.daumcdn.net/thumb/C408x596/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fmovie%2F429eb190370d6e553a0e11d434c36240b7e07e8d" alt="영화포스터" class="img"></div>
-                        <h3>유랑지구2</h3>
-                        <p>평점 <span class='score'>4.8</span> 예매율 0.1%</p>
-                        <p>개봉 23.05.10</p>
-                    </td>
-                </tr>
-            </table>
+            <%int num = 1; %>
+            <tr>
+            <c:forEach items="${totalArray}" var="boxoffice" begin="0" end="4">
+				<td>
+					<div class="rank">
+						<%=num %>
+					</div>
+					<div class='inner_wrap'>
+                           <div class="inner_text">
+                               <span class="back"> <c:out value="${boxoffice.contents }"></c:out> </span>
+                           </div>
+                       </div> 
+                       <div class='img_wrap'>
+                               <img referrerpolicy="no-referrer" src="${boxoffice.imgurl}" alt="영화포스터" class="img">
+                       </div>
+                       <h3><c:out value="${boxoffice.movieNm }"/></h3>
+                       <p>평점 <span class='score'>${boxoffice.grade}</span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
+                       <p>개봉 <c:out value="${boxoffice.openDt }"/></p>
+				</td>	
+			<%num++; %>
+			</c:forEach>
+			</tr>
+			<tr>
+			<c:forEach items="${totalArray}" var="boxoffice" begin="5" end="10">
+				<td>
+					<div class="rank">
+						<%=num %>
+					</div>
+					<div class='inner_wrap'>
+                           <div class="inner_text">
+                               <span class="back"> <c:out value="${boxoffice.contents }"></c:out> </span>
+                           </div>
+                       </div> 
+                       <div class='img_wrap'>
+                               <img referrerpolicy="no-referrer" src="${boxoffice.imgurl}" alt="영화포스터" class="img">
+                       </div>
+                       <h3><c:out value="${boxoffice.movieNm }"/></h3>
+                       <p>평점 <span class='score'>${boxoffice.grade}</span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
+                       <p>개봉 <c:out value="${boxoffice.openDt }"/></p>
+				</td>	
+			<%num++; %>
+			</c:forEach>
+			</tr>
+          	</table>
             <table class="action table"> 
                     <!-- <tr>
                         <td colspan="5" class="text"><strong>액션</strong></td>
@@ -903,9 +694,9 @@
                         <p>개봉 23.01.12</p>
                     </td>
                 </tr>
-            </table>
+            </table> 
             <table class="fantasy table">
-                <tr>
+				<tr>
                     <td>
                         <div class="rank">1</div>
                         <div class='inner_wrap'>
@@ -1006,16 +797,18 @@
 
         </div>
     </div>   
-    <nav>
-        <div class="num_wrap active">
-            <span class="prev" >&lt;</span>
-            <span class="num purple" >1</span>
-            <span class="num">2</span>
-            <span class="num">3</span>
-            <span class="num">4</span>
-            <span class="num">5</span>
-            <span class="next">&gt;</span>
-        </div>
+    <nav class="num_nav">
+	    <div class="num_div">
+	        <div class="num_wrap">
+	            <span class="prev" >&lt;</span>
+	            <span class="num purple" >1</span>
+	            <span class="num">2</span>
+	            <span class="num">3</span>
+	            <span class="num">4</span>
+	            <span class="num">5</span>
+	            <span class="next">&gt;</span>
+	        </div>
+	    </div>
     </nav>
     <footer id="foot">
 
@@ -1024,6 +817,6 @@
         </P>
     
     </footer>
-    <script type="text/javascript" src="resources/js/rank.js"></script>
+    <script type="text/javascript" src="resources/js/rank.js?v=2"></script>
 </body>
 </html>

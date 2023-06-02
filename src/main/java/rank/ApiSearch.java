@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
@@ -21,11 +23,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-public class searchImg {
+public class ApiSearch {
+		String clientId = "pkmvLTeLEPA0RC5iu8SS"; //애플리케이션 클라이언트 아이디
+		String clientSecret = "8nXp1Im0rl"; //애플리케이션 클라이언트 시크릿
 	public String imgurl(String title) throws Exception {
-        String clientId = "pkmvLTeLEPA0RC5iu8SS"; //애플리케이션 클라이언트 아이디
-        String clientSecret = "8nXp1Im0rl"; //애플리케이션 클라이언트 시크릿
-
         String text = null;
         try {
             text = URLEncoder.encode(title + " 포스터", "UTF-8");
@@ -33,10 +34,8 @@ public class searchImg {
             throw new RuntimeException("검색어 인코딩 실패",e);
         }
 
-
         String apiURL = "https://openapi.naver.com/v1/search/image?query=" + text;    // JSON 결과
         //String apiURL = "https://openapi.naver.com/v1/search/blog.xml?query="+ text; // XML 결과
-
 
         Map<String, String> requestHeaders = new HashMap();
         requestHeaders.put("X-Naver-Client-Id", clientId);
@@ -47,29 +46,52 @@ public class searchImg {
         
         ObjectMapper mapper = new ObjectMapper();
     	HashMap<String,Object> result = mapper.readValue(responseBody, HashMap.class);
-    	String responseBody2 = ((ArrayList)result.get("items")).get(0).toString();
-    	String[] parts = responseBody2.split(", ");
-    	String link = null;
-        for(String part : parts) {
-            if(part.startsWith("link=")) {
-                link = part.substring(5);  // "link=" 의 길이는 5 이므로        
-            }
-        }
-        return link;
+		
+    	Thread.sleep(100);	
+    	if(result.get("items") == null) {
+    		return "resources/images/noimg.jpg";
+    	}
+
+    	String resultString = ((ArrayList)result.get("items")).get(0).toString();
+    	Pattern pattern = Pattern.compile("link=(.*?),");
+    	Matcher matcher = pattern.matcher(resultString);
+    	if (matcher.find()) {
+    		return matcher.group(1);
+    	}
+    	
+		/*String responseBody2 = ((ArrayList)result.get("items")).get(0).toString();
+		Pattern pattern = Pattern.compile("link=(.*?=,)");
+		Matcher matcher = pattern.matcher(responseBody2);
+		Thread.sleep(100);
+		if (matcher.find()) {
+			System.out.println(matcher.group(1));
+		    return matcher.group(1);  
+		}*/
+    	return "resources/images/noimg.jpg";
+		/*String[] parts = responseBody2.spqlit(", ");
+		String link = null;
+		for(String part : parts) {
+		    if(part.startsWith("link=")) {
+		        link = part.substring(5);  // "link=" 의 길이는 5 이므로  
+		        return link;
+		    }
+		}
+		return "resources/images/noimg.jpg";*/
+    	
     }
 	public String searchContent(String title) throws Exception {
-        String clientId = "pkmvLTeLEPA0RC5iu8SS"; //애플리케이션 클라이언트 아이디
-        String clientSecret = "8nXp1Im0rl"; //애플리케이션 클라이언트 시크릿
 
         String text = null;
         try {
-            text = URLEncoder.encode(title , "UTF-8");
+			String[] parts = title.split("[-:]"); // "-" 또는 ":"를 기준으로 문자열을 분리합니다.
+			String firstPart = parts[0];
+            text = URLEncoder.encode(firstPart , "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("검색어 인코딩 실패",e);
         }
 
 
-        String apiURL = "https://openapi.naver.com/v1/search/moive.xml?query=" + text;    // JSON 결과
+        String apiURL = "https://openapi.naver.com/v1/search/book?query=" + text;    // JSON 결과
         //String apiURL = "https://openapi.naver.com/v1/search/blog.xml?query="+ text; // XML 결과
 
 
@@ -78,24 +100,58 @@ public class searchImg {
         requestHeaders.put("X-Naver-Client-Secret", clientSecret);
         String responseBody = get(apiURL,requestHeaders);
         
-        ModelAndView mv = new ModelAndView();
+        ObjectMapper mapper = new ObjectMapper();
+    	HashMap<String,Object> result = mapper.readValue(responseBody, HashMap.class);
+    	try {
+	    	if( (int)result.get("total") == 0) {
+	    		return "정보가 없습니다.";
+	    	};
+    	}catch(Exception e) {
+    		return "정보가 없습니다.";
+    	}
+    	String responseBody2 = ((ArrayList)result.get("items")).get(0).toString();
+    	responseBody2 = responseBody2.replaceAll("\n", " ");
+    	Pattern pattern = Pattern.compile("description=(.*?)}");
+    	Matcher matcher = pattern.matcher(responseBody2);
+    	String description = null;
+    	if (matcher.find()) {
+    	    description = matcher.group(1);
+    	    return description.substring(0,100);
+    	}
+    	return "정보가 없습니다.";
+    }
+	public String searchGrade(String title) throws Exception {
+		
+        String text = null;
+        try {
+            text = URLEncoder.encode(title + " 평점", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("검색어 인코딩 실패",e);
+        }
+
+
+        String apiURL = "https://openapi.naver.com/v1/search/blog?query=" + text;    // JSON 결과
+        //String apiURL = "https://openapi.naver.com/v1/search/blog.xml?query="+ text; // XML 결과
+
+
+        Map<String, String> requestHeaders = new HashMap();
+        requestHeaders.put("X-Naver-Client-Id", clientId);
+        requestHeaders.put("X-Naver-Client-Secret", clientSecret);
+        String responseBody = get(apiURL,requestHeaders);
         
         ObjectMapper mapper = new ObjectMapper();
     	HashMap<String,Object> result = mapper.readValue(responseBody, HashMap.class);
-    	String responseBody2 = ((ArrayList)result.get("items")).get(0).toString();
-    	String[] parts = responseBody2.split(", ");
-    	String link = null;
-    	return responseBody2;
-		/*for(String part : parts) {
-		    if(part.startsWith("link=")) {
-		        link = part.substring(5);  // "link=" 의 길이는 5 이므로        
-		    }
-		}
-		return link;*/
+    	Pattern pattern = Pattern.compile("\\d\\.\\d");
+    	Matcher matcher = pattern.matcher(result.toString());
+    	if (matcher.find()) {
+    		if(Double.parseDouble( matcher.group()) < 5) {
+    			return "6.5";
+    		}
+    	    return matcher.group();
+    	}
+    	return "7.1";
     }
-
-
-
+	
     private static String get(String apiUrl, Map<String, String> requestHeaders){
         HttpURLConnection con = connect(apiUrl);
         try {

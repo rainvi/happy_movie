@@ -12,49 +12,62 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class aa {
 
-	public static void main(String[] args) throws JsonMappingException, JsonProcessingException {
-	        String clientId = "pkmvLTeLEPA0RC5iu8SS"; //애플리케이션 클라이언트 아이디
-	        String clientSecret = "8nXp1Im0rl"; //애플리케이션 클라이언트 시크릿
+	public static void main(String[] args) throws JsonMappingException, JsonProcessingException, InterruptedException {
+		long startTime = System.currentTimeMillis();
+		String clientId = "pkmvLTeLEPA0RC5iu8SS"; //애플리케이션 클라이언트 아이디
+        String clientSecret = "8nXp1Im0rl"; //애플리케이션 클라이언트 시크릿
 
-	        String text = null;
-	        try {
-	            text = URLEncoder.encode("분노의 질주: 라이드 오어 다이" , "UTF-8");
-	        } catch (UnsupportedEncodingException e) {
-	            throw new RuntimeException("검색어 인코딩 실패",e);
-	        }
-
-
-	        String apiURL = "https://openapi.naver.com/v1/search/book?query=" + text;    // JSON 결과
-	        //String apiURL = "https://openapi.naver.com/v1/search/blog.xml?query="+ text; // XML 결과
+        String text = null;
+        try {
+            text = URLEncoder.encode("분노의 질주"+ " 포스터", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("검색어 인코딩 실패",e);
+        }
 
 
-	        Map<String, String> requestHeaders = new HashMap();
-	        requestHeaders.put("X-Naver-Client-Id", clientId);
-	        requestHeaders.put("X-Naver-Client-Secret", clientSecret);
-	        String responseBody = get(apiURL,requestHeaders);
-	        
-	        ModelAndView mv = new ModelAndView();
-	        
-	        ObjectMapper mapper = new ObjectMapper();
-	    	HashMap<String,Object> result = mapper.readValue(responseBody, HashMap.class);
-	    	System.out.println(result);
-			/*for(String part : parts) {
-			    if(part.startsWith("link=")) {
-			        link = part.substring(5);  // "link=" 의 길이는 5 이므로        
-			    }
-			}
-			return link;*/
-	    }
+        String apiURL = "https://openapi.naver.com/v1/search/image?query=" + text;    // JSON 결과
+        //String apiURL = "https://openapi.naver.com/v1/search/blog.xml?query="+ text; // XML 결과
 
+
+        Map<String, String> requestHeaders = new HashMap();
+        requestHeaders.put("X-Naver-Client-Id", clientId);
+        requestHeaders.put("X-Naver-Client-Secret", clientSecret);
+        String responseBody = get(apiURL,requestHeaders);
+        System.out.println(responseBody);
+        ModelAndView mv = new ModelAndView();
+        
+		ObjectMapper mapper = new ObjectMapper();
+		HashMap<String,Object> result = mapper.readValue(responseBody, HashMap.class);
+		System.out.println(result.toString());
+		if(result.get("items") == null) {
+			System.out.println("resources/images/noimg.jpg");
+		}
+		String resultString = ((ArrayList)result.get("items")).get(0).toString();
+        System.out.println(resultString);
+    	Pattern pattern = Pattern.compile("link=(.*?),");
+    	Matcher matcher = pattern.matcher(resultString);
+    	if (matcher.find()) {	
+    		System.out.println(matcher.group(1));
+    	    
+    	}
+    	long endTime = System.currentTimeMillis();
+    	long timeElapsed = endTime - startTime;
+    	System.out.println("걸린시간: " + timeElapsed);
+	 }
+	
 
 
 	    private static String get(String apiUrl, Map<String, String> requestHeaders){

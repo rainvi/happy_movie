@@ -1,10 +1,10 @@
 $("#reservation").on("click", function() {
     $('.table').removeClass("active");
     $('.reservation').addClass("active");
-    $('.num_wrap').addClass("active");
     $('.link').removeClass('purple');
     $('.genre_text').removeClass('purple');
     $(this).addClass('purple');
+    $('.num_nav').removeClass('active');
 });
 $("#grade").on("click", function() {
     $('.table').removeClass("active");
@@ -13,6 +13,7 @@ $("#grade").on("click", function() {
     $('.link').removeClass('purple');
     $('.genre_text').removeClass('purple');
     $(this).addClass('purple');
+    $('.num_nav').removeClass('active');
 });
 $("#genre").on("mouseover", function() {
     $('.genre_choice').css('display','block');
@@ -69,7 +70,8 @@ let view_action = function(){
     $('.action').addClass('active');
     $('.link').removeClass('purple');
     $('#genre').addClass('purple')
-    $('.link').removeClass('active');    
+    $('.link').removeClass('active');
+    $('.num_nav').addClass('active'); 
 };
 let view_comedy = function(){
     $('.table').removeClass("active");
@@ -79,6 +81,7 @@ let view_comedy = function(){
     $('.link').removeClass('purple');
     $('#genre').addClass('purple')
     $('.link').removeClass('active');
+    $('.num_nav').addClass('active');
 };
 let view_thriller = function(){
     $('.table').removeClass("active");
@@ -86,7 +89,8 @@ let view_thriller = function(){
     $('#thriller').addClass('purple');
     $('.thriller').addClass('active');
     $('.link').removeClass('purple');
-    $('#genre').addClass('purple')
+    $('#genre').addClass('purple');
+    $('.num_nav').addClass('active');
 };
 let view_romance = function(){
     $('.table').removeClass("active");
@@ -95,6 +99,7 @@ let view_romance = function(){
     $('.romance').addClass('active');
     $('.link').removeClass('purple');
     $('#genre').addClass('purple');
+    $('.num_nav').addClass('active');
 };
 let view_fantasy = function(){
     $('.table').removeClass("active");
@@ -103,6 +108,7 @@ let view_fantasy = function(){
     $('.fantasy').addClass('active');
     $('.link').removeClass('purple');
     $('#genre').addClass('purple');
+    $('.num_nav').addClass('active');
 };
 $('#action').on('click',view_action);
 $('#comedy').on('click',view_comedy);
