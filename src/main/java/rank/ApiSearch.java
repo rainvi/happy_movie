@@ -24,9 +24,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class ApiSearch {
+		
+	public String imgurl(String title) throws Exception {
 		String clientId = "pkmvLTeLEPA0RC5iu8SS"; //애플리케이션 클라이언트 아이디
 		String clientSecret = "8nXp1Im0rl"; //애플리케이션 클라이언트 시크릿
-	public String imgurl(String title) throws Exception {
         String text = null;
         try {
             text = URLEncoder.encode(title + " 포스터", "UTF-8");
@@ -41,22 +42,29 @@ public class ApiSearch {
         requestHeaders.put("X-Naver-Client-Id", clientId);
         requestHeaders.put("X-Naver-Client-Secret", clientSecret);
         String responseBody = get(apiURL,requestHeaders);
-        
+        if(responseBody == null) {
+        	return "resources/images/noimg.jpg";
+        }
         ModelAndView mv = new ModelAndView();
         
         ObjectMapper mapper = new ObjectMapper();
     	HashMap<String,Object> result = mapper.readValue(responseBody, HashMap.class);
-		
-    	Thread.sleep(100);	
-    	if(result.get("items") == null) {
+			
+		/*System.out.println(result);*/
+    	if(result == null || ((ArrayList)result.get("items")).size() == 0  || result.get("items") == null) {
     		return "resources/images/noimg.jpg";
     	}
-
+    	
     	String resultString = ((ArrayList)result.get("items")).get(0).toString();
+    	
     	Pattern pattern = Pattern.compile("link=(.*?),");
     	Matcher matcher = pattern.matcher(resultString);
     	if (matcher.find()) {
+    		if(matcher.group(1).length() > 200) {
+    			return "resources/images/noimg.jpg";
+    		}else {
     		return matcher.group(1);
+    		}
     	}
     	
 		/*String responseBody2 = ((ArrayList)result.get("items")).get(0).toString();
@@ -80,6 +88,8 @@ public class ApiSearch {
     	
     }
 	public String searchContent(String title) throws Exception {
+		String clientId = "aufm0IPqyofeaqYAWLU1"; //애플리케이션 클라이언트 아이디
+		String clientSecret = "gE9QGJnsR2"; //애플리케이션 클라이언트 시크릿
 
         String text = null;
         try {
@@ -116,11 +126,16 @@ public class ApiSearch {
     	String description = null;
     	if (matcher.find()) {
     	    description = matcher.group(1);
-    	    return description.substring(0,100);
+    	    if(description.length()>2000) {
+    	    	description = description.substring(0,2000);
+    	    }
+    	    return description;
     	}
     	return "정보가 없습니다.";
     }
 	public String searchGrade(String title) throws Exception {
+		String clientId = "gvLroCPhpHM_NKjKE44o"; //애플리케이션 클라이언트 아이디
+		String clientSecret = "4Ju7qS9h2s"; //애플리케이션 클라이언트 시크릿
 		
         String text = null;
         try {

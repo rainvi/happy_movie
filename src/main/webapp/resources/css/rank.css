@@ -124,6 +124,7 @@ h2{
 }
 img{
     width: 250px;
+    height: 370px;
 }
 
 td{
@@ -274,7 +275,7 @@ strong{
     
 }
 .genre_choice{
-    display:none;
+	display:none;
     cursor: pointer;
     position:absolute;
     width:1400px;
@@ -332,5 +333,7 @@ button{
 .genre_text .color{
     color:#892CDC;
 }
-
+a{
+	color:inherit;
+}
 

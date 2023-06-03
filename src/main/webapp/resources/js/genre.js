@@ -20,16 +20,6 @@ $('.table').removeClass("active");
     $('.genre_table').removeClass('active'); 
 }
 $("#grade").on("click", view_grade);
-$("#genre").on("mouseover", function() {
-    $('.genre_choice').css('display','block');
-}).on('mouseleave',function(){
-    $('.genre_choice').css('display','none');
-});
-$('.genre_choice').on('mouseover',function(){
-    $(this).css('display','block');
-}).on('mouseleave',function(){
-    $(this).css('display','none');
-})
 $('.num').on('click',function(){
     $('.num').removeClass('purple');
     $(this).addClass('purple');
@@ -59,7 +49,9 @@ $('.img_wrap').on('mouseover',function(){
 }).on('mouseleave',function(){
     $(this).prev().find('.inner_text').css('display','none');
 });
-
+$('.inner_wrap, h3').on('click',function() {
+    window.location.href = './detailed_page.html';
+ });
 $('.inner_text').on('mouseenter',function(){
     $(this).css('display','block');
 }).on('mouseleave',function(){
