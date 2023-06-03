@@ -108,16 +108,26 @@ $(document).ready(function() {
 
     /// Main
     AvgGrade();
+    
+    // bookmark_img
+	$(".bookmark_img").click(function(){
+		if($(this).attr("alt") == "bookmarkOn") {
+			$(this).attr({
+				"class": "bookmark_img b_off",
+				"alt": "bookmarkOff",
+				"src": "resources/images/bookmarkOff.svg"
+			});
+		}
+		else {
+			$(this).attr({
+				"class": "bookmark_img b_on",
+				"alt": "bookmarkOn",
+				"src": "resources/images/bookmarkOn.svg"
+			});
+		}
+	});
 
     /// Contents
-    // photo contents
-    posters.slice(0, 9).forEach(p => {
-        $("#posters_table").append(`<td><img src='resources/images/photos/posters/${p}'></td>`);
-    });
-    stills.slice(0, 5).forEach(s => {
-        $("#stills_table").append(`<td><img src='resources/images/photos/stills/${s}'></td>`);
-    });
-
     // find footer top
     let FooterTop = function(end) {
         $("footer").css("top", end);
@@ -137,38 +147,6 @@ $(document).ready(function() {
         let target = $(this).data("target");
         $(target).css("display", "none");
         $("#photo_contents").css("display", "block");
-    });
-
-    /// Photo event
-    // more button event
-    function ShowPhotoSlide(photo_type, photo_arr) {
-        let index = 0;
-        let big_img = $(`#big_${photo_type}`);
-        $(`#${photo_type}_more_title h3`).text(`1/${photo_arr.length}`);
-        big_img.attr("src", `resources/images/photos/${photo_type}/${photo_arr[index]}`);
-
-        $(".prev_btn").on("click", function() {
-            index = (index + photo_arr.length - 1) % photo_arr.length;
-            $(`#${photo_type}_more_title h3`).text(`${index + 1}/${photo_arr.length}`);
-            big_img.fadeOut(150, function() {
-                big_img.attr("src", `resources/images/photos/${photo_type}/${photo_arr[index]}`);
-                big_img.fadeIn(150);
-            });
-        });
-        $(".next_btn").on("click", function() {
-            index = (index + 1) % photo_arr.length;
-            $(`#${photo_type}_more_title h3`).text(`${index + 1}/${photo_arr.length}`);
-            big_img.fadeOut(150, function() {
-                big_img.attr("src", `resources/images/photos/${photo_type}/${photo_arr[index]}`);
-                big_img.fadeIn(150);
-            });
-        });
-    };
-    $("#posters_more").on("click", function() {
-        ShowPhotoSlide("posters", posters);
-    });
-    $("#stills_more").on("click", function() {
-        ShowPhotoSlide("stills", stills);
     });
 
     /// Grade event

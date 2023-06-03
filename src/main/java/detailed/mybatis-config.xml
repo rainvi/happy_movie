@@ -9,6 +9,8 @@
 	<typeAliases>
 		<typeAlias type="dto.UserDTO" alias="userdto"/>
 		<typeAlias type="dto.MovieDTO" alias="moviedto"/>
+		<typeAlias type="dto.ImageDTO" alias="imagedto"/>
+		<typeAlias type="dto.CrewDTO" alias="crewdto"/>
 	</typeAliases>
 
 </configuration>

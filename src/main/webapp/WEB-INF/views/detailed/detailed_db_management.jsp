@@ -48,9 +48,6 @@
 </head>
 <body>
 	<h1 id="boxH1"></h1>
-	<form action="detaileddbmanagement" method="post" id="boxForm">
-		<input type="submit" value="일별 박스오피스 순위권 영화 전송"><br>
-	</form>
-	<hr>
+	<div id="boxForm"></div>
 </body>
 </html>
