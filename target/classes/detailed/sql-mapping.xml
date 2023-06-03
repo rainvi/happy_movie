@@ -6,12 +6,33 @@
 		select * from user_table
 	</select>
 	
+	<select id="imageList" resultType="imagedto">
+		select * from image_table
+	</select>
+	
+	<select id="crewList" resultType="crewdto">
+		select * from crew_table
+	</select>
+	
 	<select id="oneMovie" parameterType="String" resultType="moviedto">
 		select * from movie_table where movie_id=#{movie_id}
 	</select>
 	
-	<insert id="insertBoxMovie" parameterType="moviedto">
-		insert into movie_table(movie_id, kor_title)
-		values(#{movie_id}, #{kor_title})
+	<insert id="insertImageTable" parameterType="imagedto">
+		insert into image_table(movie_id, img_url, img_type)
+		values(#{movie_id}, #{img_url}, #{img_type})
 	</insert>
+	
+	<select id="imagePS" parameterType="imagedto" resultType="String">
+		select img_url from image_table where movie_id=#{movie_id} and img_type=#{img_type}
+	</select>
+	
+	<insert id="insertCrewTable" parameterType="crewdto">
+		insert into crew_table(movie_id, name, profile_url)
+		values(#{movie_id}, #{name}, #{profile_url})
+	</insert>
+	
+	<select id="crewProfile" parameterType="String" resultType="crewdto">
+		select * from crew_table where movie_id=#{movie_id}
+	</select>
 </mapper>

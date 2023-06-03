@@ -9,114 +9,198 @@
     <link href="resources/css/detailed.css" rel=stylesheet>
     <script src="resources/js/jquery-3.6.4.min.js"></script>
     <script src="resources/js/KobisOpenAPIRestService.js"></script>
-<!--     <script src="resources/js/detailed_api.js"></script> -->
     <script src="resources/js/detailed.js"></script>
     <script>
-	    $(document).ready(function() {
-	        let key = "736697ae7e8ff21f7f31778b2d47a87d";
-	        let movieCd = ${ movie_id };
-	        
-	        // 어제 날짜
-	        let yesterday = new Date();
-	        yesterday.setDate(yesterday.getDate() - 1);
-	        let options = {
-	        		year: "numeric",
-	        		month: "2-digit",
-	        		day: "2-digit"
-	        };
-	        let targetDt = yesterday.toLocaleDateString('ko-KR', options).replace(/\./g, "").replace(/\s/g, "");
+
+    </script>
+    <script>
+		// Model Data
+		let movieCd = ${ movie_id };
+		let poster_list = "${ poster_list }".slice(1, -1).split(", ");
+		let still_list = "${ still_list }".slice(1, -1).split(", ");
+
+		if (poster_list.length == 1) {
+			poster_list = [];
+			still_list = [];
+			
+			for (let i = 0; i <= 13; i++)
+				poster_list.push("resources/images/photos/posters/poster" + i + ".jfif");
+			for (let i = 0; i <= 18; i++)
+				still_list.push("resources/images/photos/stills/still" + i + ".jfif");
+		};
 		
-	        // 영화 상세 정보 API data load
-	        $.ajax({
-	            type: "get",
-	            url: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key=" + key + "&movieCd=" + movieCd,
-	            success: function(data) {
-	            	let movieData = data.movieInfoResult.movieInfo;
-	            	
-	            	// 리턴 타입 array X
-	            	let movieNm = movieData.movieNm; // 영화명(국문)
-	            	let movieNmEn = movieData.movieNmEn;	// 영화명(영문)
-	            	let showTm = movieData.showTm;	// 상영시간
-	            	let openDt = movieData.openDt;	// 개봉연도
-	            	let audits = movieData.audits[0].watchGradeNm;	// 심의정보
-	            	let companys = movieData.companys[0].companyNm;	// 제작사
-	            	
-	            	$("#detailed_title").text(movieNm + "ㅣHAPPYMOVIE");
-	            	$("#movieNm").text(movieNm);
-	            	$("#movieNmEn").text(movieNmEn + ", " + openDt.substring(0, 4));
-	            	$("#showTm").text(showTm + "분");
-	            	$("#openDt").text(openDt.substring(0, 4) + "." + openDt.substring(4, 6) + "." + openDt.substring(6, 8));
-	            	$("#audits").text(audits);
-	            	$("#companys").text(companys);
-	            	
-	            	// 리턴 타입 array O
-	            	// 제작국가
-	            	let nations = [];
-	            	for (let i = 0; i < movieData.nations.length; i++) {
-	            		nations.push(movieData.nations[i].nationNm);
-	            	}
-	            	nations = nations.join(", ");
-	            	$("#nations").text(nations);
-	            	
-	            	// 장르명
-	            	let genres = [];	// 장르
-	            	for (let i = 0; i < movieData.genres.length; i++) {
-	            		genres.push(movieData.genres[i].genreNm);
-	            	}
-	            	genres = genres.join("/");
-	            	$("#genres").text(genres);
-	            	
-	            	// 감독
-	            	let directors = [];
-	            	for (let i = 0; i < movieData.directors.length; i++) {
-	            		directors.push(movieData.directors[i].peopleNm);
-	            	}
-	            	directors = directors.join(", ");
-	            	$("#directors").text(directors);
-	            }	// success end
-	        });	// ajax end
-	        
-	        // 일별 박스오피스 순위 API data load
-	        $.ajax({
-	        	type: "get",
-	        	url: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=" + key + "&targetDt=" + targetDt,
-	        	success: function(data) {
-	        		let boxData = data.boxOfficeResult.dailyBoxOfficeList;
-	        		let rank, audiAcc;	// 순위, 누적관객수
-	        		for (let i = 0; i < boxData.length; i++) {
-	        			if (movieCd == boxData[i].movieCd) {
-	        				rank = boxData[i].rank;
-	        				audiAcc = boxData[i].audiAcc;
-	        				audiAcc = parseInt(audiAcc).toLocaleString("en-US");
-	        				
-	        				$("#main_table").append("<tr>"
-	        						+ "<th>박스오피스</th><td id='rank'><a href='rank'>"
-	        						+ rank + "위</a></td>"
-	        		                + "<th>누적관객</th><td>"
-	        		                + audiAcc +"명</td></tr>"
-	        				);
-	        				break;
-	        			}
-	        		}
-	        	}	// success end
-	        });	// ajax end
-	    });	// document end
+		/// API
+		// API data
+		let key = "736697ae7e8ff21f7f31778b2d47a87d";
+		let yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+		let options = {
+		        year: "numeric",
+		        month: "2-digit",
+		        day: "2-digit"
+		};
+		let targetDt = yesterday.toLocaleDateString('ko-KR', options).replace(/\./g, "").replace(/\s/g, "");
+		
+		/// document
+		$(document).ready(function() {
+			// 영화 상세 정보 API data load
+			$.ajax({
+			    type: "get",
+			    url: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key=" + key + "&movieCd=" + movieCd,
+			    success: function(data) {
+			        let movieData = data.movieInfoResult.movieInfo;
+			        
+			        // 리턴 타입 array X
+			        let movieNm = movieData.movieNm; // 영화명(국문)
+			        let movieNmEn = movieData.movieNmEn;	// 영화명(영문)
+			        let showTm = movieData.showTm;	// 상영시간
+			        let openDt = movieData.openDt;	// 개봉연도
+			        let audits = movieData.audits[0].watchGradeNm;	// 심의정보
+			        
+			        $("#detailed_title").text(movieNm + "ㅣHAPPYMOVIE");
+			        $("#movieNm").text(movieNm);
+			        $("#movieNmEn").text(movieNmEn + ", " + openDt.substring(0, 4));
+			        $("#showTm").text(showTm + "분");
+			        $("#openDt").text(openDt.substring(0, 4) + "." + openDt.substring(4, 6) + "." + openDt.substring(6, 8));
+			        $("#audits").text(audits);
+			        
+			        // 리턴 타입 array O
+			        // 제작국가
+			        let nations = [];
+			        for (let i = 0; i < movieData.nations.length; i++) {
+			            nations.push(movieData.nations[i].nationNm);
+			        }
+			        nations = nations.join(", ");
+			        $("#nations").text(nations);
+			        
+			        // 장르명
+			        let genres = [];	// 장르
+			        for (let i = 0; i < movieData.genres.length; i++) {
+			            genres.push(movieData.genres[i].genreNm);
+			        }
+			        genres = genres.join("/");
+			        $("#genres").text(genres);
+			        
+			        // 감독
+			        let directors = movieData.directors;
+			        let directorsNm = [];
+			        directors.forEach(d => {
+			            // main info
+			            directorsNm.push(d.peopleNm);
+			            
+			            // person contents
+			            $("#director_table tr:nth-child(2)").append("<td>" + d.peopleNm + "</td>");
+
+			        });
+			        directorsNm = directorsNm.join(", ");
+			        $("#directors").text(directorsNm);
+			        
+			        // 배우
+			        let actors = movieData.actors;
+			        actors.forEach(a => {
+			            // person contents
+			            $("#actor_table tr:nth-child(2)").append("<td>" + a.peopleNm + "</td>");
+			            $("#actor_table tr:nth-child(3)").append("<td>" + a.cast + " 역</td>");
+			        });
+			        
+			        // 제작진
+			        let staffs = movieData.staffs;
+			        staffs.forEach(s => {
+			            // person contents
+			            $("#crew_table").append("<tr><td>" + s.staffRoleNm + "</td><td>" + s.peopleNm + "</td></tr>");
+			        });
+			        
+			        // 제작사
+			        let companys = movieData.companys;
+			        $("#companys").text(companys[0].companyNm);	// main info
+			        companys.forEach(c => {
+			            // person contents
+			            $("#company_table").append("<tr><td>" + c.companyPartNm + "</td><td>" + c.companyNm + "</td></tr>");
+			        });
+			    }	// success end
+			});	// ajax end
+		
+			// 일별 박스오피스 순위 API data load
+			$.ajax({
+			    type: "get",
+			    url: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=" + key + "&targetDt=" + targetDt,
+			    success: function(data) {
+			        let boxData = data.boxOfficeResult.dailyBoxOfficeList;
+			        let rank, audiAcc;	// 순위, 누적관객수
+			        for (let i = 0; i < boxData.length; i++) {
+			            if (movieCd == boxData[i].movieCd) {
+			                rank = boxData[i].rank;
+			                audiAcc = boxData[i].audiAcc;
+			                audiAcc = parseInt(audiAcc).toLocaleString("en-US");
+			                
+			                $("#main_table").append("<tr>"
+			                        + "<th>박스오피스</th><td id='rank'><a href='rank'>"
+			                        + rank + "위</a></td>"
+			                        + "<th>누적관객</th><td>"
+			                        + audiAcc +"명</td></tr>"
+			                );
+			                break;
+			            };	// if end
+			        };	// for end
+			    }	// success end
+			});	// ajax end
+			
+		    /// Photo event
+		    // more button event
+		    function ShowPhotoSlide(photo_type, photo_arr) {
+		        let index = 0;
+		        let big_img = $("#big_" + photo_type);
+		        $("#" + photo_type + "_more_title h3").text("1/" + photo_arr.length);
+		        big_img.attr("src", photo_arr[index]);
+
+		        $(".prev_btn").on("click", function() {
+		            index = (index + photo_arr.length - 1) % photo_arr.length;
+		            $("#" + photo_type + "_more_title h3").text((index + 1) + "/" + photo_arr.length);
+		            big_img.fadeOut(150, function() {
+		                big_img.attr("src", photo_arr[index]);
+		                big_img.fadeIn(150);
+		            });
+		        });
+		        $(".next_btn").on("click", function() {
+		            index = (index + 1) % photo_arr.length;
+		            $("#" + photo_type + "_more_title h3").text((index + 1) + "/" + photo_arr.length);
+		            big_img.fadeOut(150, function() {
+		                big_img.attr("src", photo_arr[index]);
+		                big_img.fadeIn(150);
+		            });
+		        });
+		    };
+		    $("#posters_more").on("click", function() {
+		        ShowPhotoSlide("posters", poster_list);
+		    });
+		    $("#stills_more").on("click", function() {
+		        ShowPhotoSlide("stills", still_list);
+		    });	// photo event end
+		    
+		});	// document end
     </script>
     <title id="detailed_title"></title>
 </head>
 <body>
     <header>
-        <a href="main.html"><img id="logo" src="resources/images/logo.svg"></a>
+        <a href="main"><img id="logo" src="resources/images/logo.svg"></a>
         <input id="login" type="button" value="LOGIN" onclick = "location.href = 'finalLogin.html'">
         <div id="search">
-            <form id="searchForm" method="GET" action="search.html" accept-charset="UTF-8">
+            <form id="searchForm" method="GET" action="search" accept-charset="UTF-8">
                 <input class="inputValue" name="query" type="text" value="영화 제목">
                 <input class="searchImg" type="image" type="submit" src="resources/images/searchIcon.svg">
             </form>
         </div>
     </header>
-
-    <img id="main_poster" src="resources/images/photos/posters/poster0.jfif">
+	<c:choose>
+		<c:when test="${ empty poster_list }">
+			<img id="main_poster" src="resources/images/photos/posters/poster0.jfif">
+		</c:when>
+		<c:otherwise>
+			<img id="main_poster" src="${ poster_list[0] }">
+		</c:otherwise>
+    </c:choose>
+	<img class="bookmark_img b_off" src="resources/images/bookmarkOff.svg" alt="bookmarkOff">
     <div id="main">
         <h1 id="movieNm"></h1>
         <h3 id="movieNmEn"></h3>
@@ -142,7 +226,7 @@
 
     <div id="main_btns">
         <input id="info_btn" class="main_btns" type="button" data-target="#info_contents" data-end="1119" value="정보">
-        <input id="person_btn" class="main_btns" type="button" data-target="#person_contents" data-end="1645" value="인물">
+        <input id="person_btn" class="main_btns" type="button" data-target="#person_contents" data-end="1800" value="인물">
         <input id="photo_btn" class="main_btns" type="button" data-target="#photo_contents" data-end="1168" value="사진">
         <input id="grade_btn" class="main_btns" type="button" data-target="#grade_contents" value="평점">
     </div>
@@ -186,12 +270,42 @@
             <h1><img class="bar" src="resources/images/Bar.svg">포스터</h1>
             <input id="posters_more" class="more_btns" type="button" data-target="#photo_contents_posters" data-end="1440" value="더보기">
         </div>
-        <table id="posters_table" class="photo_table"><tr></tr></table>
+        <table id="posters_table" class="photo_table">
+        	<tr>
+        		<c:choose>
+        			<c:when test="${ empty poster_list }">
+        				<c:forEach var="i" begin="0" end="8">
+		        			<td><img src="resources/images/photos/posters/poster${ i }.jfif"></td>
+		        		</c:forEach>
+        			</c:when>
+        			<c:otherwise>
+		        		<c:forEach items="${ poster_list }" var="imgP" end="8">
+		        			<td><img src="${ imgP }"></td>
+		        		</c:forEach>
+        			</c:otherwise>
+        		</c:choose>
+        	</tr>
+        </table>
         <div id="stills_title" class="photo_titles">
             <h1><img class="bar" src="resources/images/Bar.svg">스틸컷</h1>
             <input id="stills_more" class="more_btns" type="button" data-target="#photo_contents_stills" data-end="1220" value="더보기">
         </div>
-        <table id="stills_table" class="photo_table"><tr></tr></table>
+        <table id="stills_table" class="photo_table">
+        	<tr>
+        		<c:choose>
+        			<c:when test="${ empty still_list }">
+        				<c:forEach var="i" begin="0" end="4">
+		        			<td><img src="resources/images/photos/stills/still${ i }.jfif"></td>
+		        		</c:forEach>
+        			</c:when>
+        			<c:otherwise>
+		        		<c:forEach items="${ still_list }" var="imgS" end="4">
+		        			<td><img src="${ imgS }"></td>
+		        		</c:forEach>
+        			</c:otherwise>
+        		</c:choose>
+        	</tr>
+        </table>
     </div>
 
     <div id="photo_contents_posters" class="contents">

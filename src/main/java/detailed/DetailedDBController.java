@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import dto.MovieDTO;
+import dto.CrewDTO;
+import dto.ImageDTO;
 import dto.UserDTO;
 
 @Controller
@@ -38,26 +38,34 @@ public class DetailedDBController {
 		return "detailed/detailed_db_management";
 	}
 	
-	@PostMapping("/detaileddbmanagement")
-	public ModelAndView detailedDBManagementPost(String[] cds, String[] nms) {
-		MovieDTO dto = new MovieDTO();
-		int cnt = 0;
+	@RequestMapping("/detaileddbinsert")
+	public String detailedDBInsert() {
+		return "detailed/detailed_db_insert";
+	}
+	
+	@RequestMapping("/detaileddbinsertimage")
+	public ModelAndView detailedDBInsertImage(ImageDTO dto) {
+		ModelAndView mv = new ModelAndView();
 		
-		for (int i = 0; i < cds.length; i++) {
-			dto = service.oneMovie(cds[i]);
-			
-			if (dto == null) {
-				dto.setMovie_id(cds[i]);
-				dto.setKor_title(nms[i]);
-				service.insertBoxMovie(dto);
-				cnt++;
-			}
-			dto = null;
+		if (dto != null && dto.getImg_url() != null) {
+			service.insertImageTable(dto);
+			mv.addObject("insertresult", "image_table insert 성공");			
 		}
 		
+		mv.setViewName("detailed/detailed_db_insert");
+		return mv;
+	}
+	
+	@RequestMapping("/detaileddbinsertcrew")
+	public ModelAndView detailedDBInsertCrew(CrewDTO dto) {
 		ModelAndView mv = new ModelAndView();
-		mv.addObject("cnt", cnt);
-		mv.setViewName("detailed/detailed_db_management_result");
+		
+		if (dto != null && dto.getProfile_url() != null) {
+			service.insertCrewTable(dto);
+			mv.addObject("insertresult", "crew_table insert 성공");			
+		}
+		
+		mv.setViewName("detailed/detailed_db_insert");
 		return mv;
 	}
 }
