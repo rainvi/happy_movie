@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import dto.CrewDTO;
 import dto.ImageDTO;
+import dto.ReviewDTO;
 import dto.UserDTO;
 
 @Controller
@@ -65,6 +66,49 @@ public class DetailedDBController {
 			mv.addObject("insertresult", "crew_table insert 성공");			
 		}
 		
+		mv.setViewName("detailed/detailed_db_insert");
+		return mv;
+	}
+	
+	@RequestMapping("/detaileddbinsertreview")
+	public ModelAndView detailedDBInsertReview(ReviewDTO dto) {
+		String user_id[] = {"gwon", "hwang", "moon", "member1", "member2", "member3", "member4", "member5", "member6", "member7", "member8", "member9"};
+		String contents[] = {"노잼",
+				"영화를 보는 내내 시간이 아까웠다.",
+				"기대했는데 실망했어요.",
+				"인생이 아주 재미없을 때 보면 재밌을수도",
+				"그냥저냥 볼만함",
+				"배우들 연기는 좋으나 연출은 별로, 스토리는 재미있었음",
+				"소소하게 재미있었어요!",
+				"꿀잼",
+				"이런 영화를 기다려왔어요.",
+				"스토리, 연기, 연출 등 모든 것이 완벽한 영화"};
+		String date[] = {
+				"2023-05-28 15:38:00",
+				"2023-05-29 21:57:00",
+				"2023-05-30 09:15:00",
+				"2023-05-31 21:15:00",
+				"2023-06-01 18:34:00",
+				"2023-06-01 16:27:00",
+				"2023-06-02 01:05:00",
+				"2023-06-02 20:12:00",
+				"2023-06-03 17:24:00",
+				"2023-06-04 03:51:00"};
+
+		for (String u : user_id) {
+			int randC = (int)(Math.random() * 10);
+			int randD = (int)(Math.random() * 10);
+			
+			dto.setUser_id(u);
+			dto.setContents(contents[randC]);
+			dto.setRating_star(randC+1);
+			dto.setWriting_time(date[randD]);
+			
+			service.insertReviewTable(dto);
+		}
+		
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("insertresult", "review_table insert 성공");		
 		mv.setViewName("detailed/detailed_db_insert");
 		return mv;
 	}

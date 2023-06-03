@@ -11,6 +11,8 @@
 		<typeAlias type="dto.MovieDTO" alias="moviedto"/>
 		<typeAlias type="dto.ImageDTO" alias="imagedto"/>
 		<typeAlias type="dto.CrewDTO" alias="crewdto"/>
+		<typeAlias type="dto.ReviewDTO" alias="reviewdto"/>
+		<typeAlias type="dto.ReviewPagingDTO" alias="pagingdto"/>
 	</typeAliases>
 
 </configuration>

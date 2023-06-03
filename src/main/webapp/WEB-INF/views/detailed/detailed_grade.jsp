@@ -9,40 +9,14 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="resources/images/MainIcon.ico">
-    <link href="resources/css/detailed/detailed.css" rel=stylesheet>
+    <link href="resources/css/detailed/detailed_main.css" rel=stylesheet>
+    <link href="resources/css/detailed/detailed_grade.css" rel=stylesheet>
     <script src="resources/js/jquery-3.6.4.min.js"></script>
     <script src="resources/js/KobisOpenAPIRestService.js"></script>
-    <script src="resources/js/detailed/detailed.js"></script>
+    <script src="resources/js/detailed/detailed_main.js"></script>
     <script>
 		/// Model Data
 		let movieCd = ${ movie_id };
-		
-		// Model-image Data
-		let poster_list = "${ poster_list }".slice(1, -1).split(", ");
-		let still_list = "${ still_list }".slice(1, -1).split(", ");
-		
-		if (poster_list.length == 1) {
-			poster_list = [];
-			still_list = [];
-			
-			for (let i = 0; i <= 13; i++)
-				poster_list.push("resources/images/photos/posters/poster" + i + ".jfif");
-			for (let i = 0; i <= 18; i++)
-				still_list.push("resources/images/photos/stills/still" + i + ".jfif");
-		};
-		
-		// Model-crew Data
-		<% List<CrewDTO> crewList = (List<CrewDTO>)request.getAttribute("crew_list"); %>
-		let crew_list = [
-			<% if(crewList != null) {
-					for (CrewDTO dto : crewList) { %>
-						{
-							name: "<%= dto.getName() %>",
-							profile_url: "<%= dto.getProfile_url() %>"
-						}, <%
-					}
-				} %>
-		];
 		
 		// Model-review Data
 		// 리뷰 생성자
@@ -142,6 +116,8 @@
 			        let showTm = movieData.showTm;	// 상영시간
 			        let openDt = movieData.openDt;	// 개봉연도
 			        let audits = movieData.audits[0].watchGradeNm;	// 심의정보
+			        let companys = movieData.companys[0].companyNm;	// 제작사
+			        
 			        
 			        $("#detailed_title").text(movieNm + "ㅣHAPPYMOVIE");
 			        $("#movieNm").text(movieNm);
@@ -149,6 +125,7 @@
 			        $("#showTm").text(showTm + "분");
 			        $("#openDt").text(openDt.substring(0, 4) + "." + openDt.substring(4, 6) + "." + openDt.substring(6, 8));
 			        $("#audits").text(audits);
+			        $("#companys").text(companys);
 			        
 			        // 리턴 타입 array O
 			        // 제작국가
@@ -173,51 +150,9 @@
 			        directors.forEach(d => {
 			            // main info
 			            directorsNm.push(d.peopleNm);
-			            
-			            // person contents
-			            let profile_url = "resources/images/profiles/none_profile.png";
-			            for (let c of crew_list) {
-			            	if (c.name == d.peopleNm) {
-			            		profile_url = c.profile_url
-			            		break;
-			            	}
-			            }
-			            $("#director_table tr:nth-child(1)").append("<td><img src='" + profile_url + "'></td>");
-			            $("#director_table tr:nth-child(2)").append("<td>" + d.peopleNm + "</td>");
 			        });
 			        directorsNm = directorsNm.join(", ");
 			        $("#directors").text(directorsNm);
-			        
-			        // 배우
-			        let actors = movieData.actors;
-			        actors.forEach(a => {
-			            // person contents
-			            let profile_url = "resources/images/profiles/none_profile.png";
-			            for (let c of crew_list) {
-			            	if (c.name == a.peopleNm) {
-			            		profile_url = c.profile_url
-			            		break;
-			            	}
-			            }
-			            $("#actor_table tr:nth-child(1)").append("<td><img src='" + profile_url + "'></td>");
-			            $("#actor_table tr:nth-child(2)").append("<td>" + a.peopleNm + "</td>");
-			            $("#actor_table tr:nth-child(3)").append("<td>" + a.cast + " 역</td>");
-			        });
-			        
-			        // 제작진
-			        let staffs = movieData.staffs;
-			        staffs.forEach(s => {
-			            // person contents
-			            $("#crew_table").append("<tr><td>" + s.staffRoleNm + "</td><td>" + s.peopleNm + "</td></tr>");
-			        });
-			        
-			        // 제작사
-			        let companys = movieData.companys;
-			        $("#companys").text(companys[0].companyNm);	// main info
-			        companys.forEach(c => {
-			            // person contents
-			            $("#company_table").append("<tr><td>" + c.companyPartNm + "</td><td>" + c.companyNm + "</td></tr>");
-			        });
 			    }	// success end
 			});	// ajax end
 		
@@ -269,40 +204,8 @@
 				}
 			});	// bookmark event end
 			
-		    /// Photo event
-		    // more button event
-		    function ShowPhotoSlide(photo_type, photo_arr) {
-		        let index = 0;
-		        let big_img = $("#big_" + photo_type);
-		        $("#" + photo_type + "_more_title h3").text("1/" + photo_arr.length);
-		        big_img.attr("src", photo_arr[index]);
-
-		        $(".prev_btn").on("click", function() {
-		            index = (index + photo_arr.length - 1) % photo_arr.length;
-		            $("#" + photo_type + "_more_title h3").text((index + 1) + "/" + photo_arr.length);
-		            big_img.fadeOut(150, function() {
-		                big_img.attr("src", photo_arr[index]);
-		                big_img.fadeIn(150);
-		            });
-		        });
-		        $(".next_btn").on("click", function() {
-		            index = (index + 1) % photo_arr.length;
-		            $("#" + photo_type + "_more_title h3").text((index + 1) + "/" + photo_arr.length);
-		            big_img.fadeOut(150, function() {
-		                big_img.attr("src", photo_arr[index]);
-		                big_img.fadeIn(150);
-		            });
-		        });
-		    };
-		    $("#posters_more").on("click", function() {
-		        ShowPhotoSlide("posters", poster_list);
-		    });
-		    $("#stills_more").on("click", function() {
-		        ShowPhotoSlide("stills", still_list);
-		    });	// photo event end
-		    
-		    /// Review event
-		    // write event
+			/// Review event
+			// write event
 		    $("#star_radio *").on("click", function() {
 		        $("#write_star").text("★" + $(this).val());
 		    });
@@ -364,27 +267,13 @@
 		    });
 
 		    // sort event
-		    function SortComment(sort_type) {
-		        let end = grade_arr.length * 125 + 1000;
-		        let target = sort_type;
-
-		        $("#comment_list").empty();
-		        grade_arr.sort(function(a, b) {
-		            if (target == "date")
-		                return new Date(a.date) - new Date(b.date);
-		            else
-		                return a[target] - b[target];
-		        });
-		        grade_arr.forEach((g) => {
-		            $("#comment_list").prepend("<li id='c_li" + g.seq + "' data-seq='" + g.seq + "'>" + g.print() + "</li>");
-		        });
-		        FooterTop(end);
-		    };
+		    $(".sort_btn[data-target='" + "${ sort_type }" + "']").addClass("sort_active");
 		    $(".sort_btn").on("click", function() {
-		        SortComment($(this).data("target"));
-		        $(this).css("font-weight", "bold");
-		        $(".sort_btn").not($(this)).css("font-weight", "normal");
+		        window.location.href = "detailedgrade?sort_type=" + $(this).data("target");
 		    });
+	        grade_arr.forEach((g) => {
+	            $("#comment_list").append("<li id='c_li" + g.seq + "' data-seq='" + g.seq + "'>" + g.print() + "</li>");
+	        });
 
 		    // comment table button event
 		    let td, what_btn, this_seq, find_data, find_pw;
@@ -480,8 +369,7 @@
 
 		        $("#c_li" + this_seq).html(find_data.print());
 		        AvgGrade();
-		    });	// review event end
-		    
+		    }); // review event end
 		});	// document end
     </script>
     <title id="detailed_title"></title>
@@ -489,7 +377,7 @@
 <body>
     <header>
         <a href="main"><img id="logo" src="resources/images/logo.svg"></a>
-        <input id="login" type="button" value="LOGIN" onclick = "location.href = 'finalLogin.html'">
+        <input id="login" type="button" value="LOGIN" onclick = "location.href = 'login'">
         <div id="search">
             <form id="searchForm" method="GET" action="search" accept-charset="UTF-8">
                 <input class="inputValue" name="query" type="text" value="영화 제목">
@@ -497,156 +385,48 @@
             </form>
         </div>
     </header>
-	<c:choose>
-		<c:when test="${ empty movie_dto.img_url }">
-			<img id="main_poster" src="resources/images/photos/posters/poster0.jfif">
-		</c:when>
-		<c:otherwise>
-			<img id="main_poster" src="${ movie_dto.img_url }">
-		</c:otherwise>
-    </c:choose>
-	<img class="bookmark_img b_off" src="resources/images/bookmarkOff.svg" alt="bookmarkOff">
-    <div id="main">
-        <h1 id="movieNm"></h1>
-        <h3 id="movieNmEn"></h3>
-        <table id="main_table">
-            <tr>
-                <th>개봉</th><td id="openDt"></td>
-                <th>평점</th><td id="main_grade">★${ movie_dto.rating_star }</td>
-            </tr>
-            <tr>
-                <th>장르</th><td id="genres"></td>
-                <th>국가</th><td id="nations"></td>
-            </tr>
-            <tr>
-                <th>등급</th><td id="audits"></td>
-                <th>러닝타임</th><td id="showTm"></td>
-            </tr>
-            <tr>
-                <th>감독</th><td id="directors"></td>
-                <th>제작사</th><td id="companys"></td>
-            </tr>
-        </table>
+	<div id="main">
+		<c:choose>
+			<c:when test="${ empty movie_dto.img_url }">
+				<img id="main_poster" src="resources/images/photos/posters/poster0.jfif">
+			</c:when>
+			<c:otherwise>
+				<img id="main_poster" src="${ movie_dto.img_url }">
+			</c:otherwise>
+	    </c:choose>
+		<img class="bookmark_img b_off" src="resources/images/bookmarkOff.svg" alt="bookmarkOff">
+		<div id="main_info">
+			<h1 id="movieNm"></h1>
+			<h3 id="movieNmEn"></h3>
+	        <table id="main_table">
+	            <tr>
+	                <th>개봉</th><td id="openDt"></td>
+	                <th>평점</th><td id="main_grade">★${ movie_dto.rating_star }</td>
+	            </tr>
+	            <tr>
+	                <th>장르</th><td id="genres"></td>
+	                <th>국가</th><td id="nations"></td>
+	            </tr>
+	            <tr>
+	                <th>등급</th><td id="audits"></td>
+	                <th>러닝타임</th><td id="showTm"></td>
+	            </tr>
+	            <tr>
+	                <th>감독</th><td id="directors"></td>
+	                <th>제작사</th><td id="companys"></td>
+	            </tr>
+	        </table>	
+		</div>
     </div>
 
     <div id="main_btns">
-        <input id="info_btn" class="main_btns" type="button" data-target="#info_contents" data-end="1119" value="정보">
-        <input id="person_btn" class="main_btns" type="button" data-target="#person_contents" data-end="1800" value="인물">
-        <input id="photo_btn" class="main_btns" type="button" data-target="#photo_contents" data-end="1168" value="사진">
-        <input id="grade_btn" class="main_btns" type="button" data-target="#grade_contents" data-end="2000" value="평점">
+        <input id="info_btn" class="main_btns" type="button" data-url="detailed" value="정보">
+        <input id="person_btn" class="main_btns" type="button" data-url="detailedperson" value="인물">
+        <input id="photo_btn" class="main_btns" type="button" data-url="detailedphoto" value="사진">
+        <input id="grade_btn" class="main_btns active" type="button" data-url="detailedgrade" value="평점">
     </div>
-
-    <div id="info_contents" class="contents">
-        <h1><img class="bar" src="resources/images/Bar.svg">시놉시스</h1>
-        <c:choose>
-	        <c:when test="${ movie_dto.synopsis == null || movie_dto.synopsis eq '정보가 없습니다.' }">
-				<p>
-		            따단-딴-따단-딴 ♫<br>
-		            전 세계를 열광시킬 올 타임 슈퍼 어드벤처의 등장!<br><br>
-		
-		            뉴욕의 평범한 배관공 형제 '마리오'와 '루이지'는<br>
-		            배수관 고장으로 위기에 빠진 도시를 구하려다<br>
-		            미스터리한 초록색 파이프 안으로 빨려 들어가게 된다.<br><br>
-		
-		            파이프를 통해 새로운 세상으로 차원 이동하게 된 형제.<br>
-		            형 '마리오'는 뛰어난 리더십을 지닌 '피치'가 통치하는 버섯왕국에 도착하지만<br>
-		            동생 '루이지'는 빌런 '쿠파'가 있는 다크랜드로 떨어지며 납치를 당하고<br>
-		            ‘마리오’는 동생을 구하기 위해 '피치'와 '키노피오'의 도움을 받아 '쿠파'에 맞서기로 결심한다.<br><br>
-		
-		            그러나 슈퍼스타로 세상을 지배하려는 그의 강력한 힘 앞에<br>
-		            이들은 예기치 못한 위험에 빠지게 되는데...!<br><br>
-		
-		            동생을 구하기 위해! 세상을 지키기 위해!<br>
-		            '슈퍼 마리오'로 레벨업하기 위한 '마리오'의 스펙터클한 스테이지가 시작된다!<br>
-	        	</p>
-			</c:when>
-			<c:otherwise>
-				<p>${ movie_dto.synopsis }</p>
-			</c:otherwise>
-		</c:choose>
-    </div>
-
-    <div id="person_contents" class="contents">
-        <h1><img class="bar" src="resources/images/Bar.svg">감독</h1>
-        <table id='director_table' class='is_profile'><tr></tr><tr></tr></table>
-        <h1><img class="bar" src="resources/images/Bar.svg">출연</h1>
-        <table id='actor_table' class='is_profile'><tr></tr><tr></tr><tr></tr></table>
-        <h1><img class="bar" src="resources/images/Bar.svg">제작진</h1>
-        <table id='crew_table' class='not_profile'></table>
-        <h1><img class="bar" src="resources/images/Bar.svg">영화사</h1>
-        <table id='company_table' class='not_profile'></table>
-    </div>
-
-    <div id="photo_contents" class="contents">
-        <div id="posters_title" class="photo_titles">
-            <h1><img class="bar" src="resources/images/Bar.svg">포스터</h1>
-            <input id="posters_more" class="more_btns" type="button" data-target="#photo_contents_posters" data-end="1440" value="더보기">
-        </div>
-        <table id="posters_table" class="photo_table">
-        	<tr>
-        		<c:choose>
-        			<c:when test="${ empty poster_list }">
-        				<c:forEach var="i" begin="0" end="8">
-		        			<td><img src="resources/images/photos/posters/poster${ i }.jfif"></td>
-		        		</c:forEach>
-        			</c:when>
-        			<c:otherwise>
-		        		<c:forEach items="${ poster_list }" var="imgP" end="8">
-		        			<td><img src="${ imgP }"></td>
-		        		</c:forEach>
-        			</c:otherwise>
-        		</c:choose>
-        	</tr>
-        </table>
-        <div id="stills_title" class="photo_titles">
-            <h1><img class="bar" src="resources/images/Bar.svg">스틸컷</h1>
-            <input id="stills_more" class="more_btns" type="button" data-target="#photo_contents_stills" data-end="1220" value="더보기">
-        </div>
-        <table id="stills_table" class="photo_table">
-        	<tr>
-        		<c:choose>
-        			<c:when test="${ empty still_list }">
-        				<c:forEach var="i" begin="0" end="4">
-		        			<td><img src="resources/images/photos/stills/still${ i }.jfif"></td>
-		        		</c:forEach>
-        			</c:when>
-        			<c:otherwise>
-		        		<c:forEach items="${ still_list }" var="imgS" end="4">
-		        			<td><img src="${ imgS }"></td>
-		        		</c:forEach>
-        			</c:otherwise>
-        		</c:choose>
-        	</tr>
-        </table>
-    </div>
-
-    <div id="photo_contents_posters" class="contents">
-        <div id="posters_more_title" class="photo_titles">
-            <h1><img class="bar" src="resources/images/Bar.svg">포스터</h1>
-            <h3></h3>
-            <input class="close_btns" type="button" data-target="#photo_contents_posters" data-end="1168" value="X">
-        </div>
-        <div class="photo_more_contents">
-            <input class="slide_btn prev_btn" type="button" value="&lt;">
-            <img id="big_posters">
-            <input class="slide_btn next_btn" type="button" value="&gt;">
-        </div>
-    </div>
-
-    <div id="photo_contents_stills" class="contents">
-        <div id="stills_more_title" class="photo_titles">
-            <h1><img class="bar" src="resources/images/Bar.svg">스틸컷</h1>
-            <h3></h3>
-            <input class="close_btns" type="button" data-target="#photo_contents_stills" data-end="1168" value="X">
-        </div>
-        <div class="photo_more_contents">
-            <input class="slide_btn prev_btn" type="button" value="&lt;">
-            <img id="big_stills">
-            <input class="slide_btn next_btn" type="button" value="&gt;">
-        </div>
-    </div>
-
-    <div id="grade_contents" class="contents">
+    
+	<div id="grade_contents" class="contents">
         <div id="grade_title">
             <h1><img class="bar" src="resources/images/Bar.svg">평점</h1>
             <h2>★8.8점(10개)</h2>
@@ -681,6 +461,18 @@
             <input class="sort_btn" data-target="star" type="button" value="별점순">
         </div>
         <ul id="comment_list"></ul>
+        <%
+        	String sort_type = (String)request.getAttribute("sort_type");
+        	int cnt = (Integer)request.getAttribute("cnt");
+        	int divNum = (Integer)request.getAttribute("divNum");
+        	int totalPage = cnt / divNum;
+        	
+        	if (cnt % divNum != 0)
+        		totalPage++;
+        	
+        	for (int p = 1; p <= totalPage; p++)
+        		out.println("<a href=\"detailedgrade?sort_type=" + sort_type + "&page=" + p + "\">" + p + "</a> ");
+        %>
     </div>
 
     <footer>

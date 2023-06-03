@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import dto.CrewDTO;
 import dto.ImageDTO;
 import dto.MovieDTO;
+import dto.ReviewDTO;
+import dto.ReviewPagingDTO;
 import dto.UserDTO;
 
 @Repository
@@ -16,6 +18,39 @@ public class DetailedDAO {
 	@Autowired
 	SqlSession session;
 	
+	/// detailed 기능
+	// movie_id로 movie_table 조회
+	public MovieDTO oneMovie(String movie_id) {
+		return session.selectOne("oneMovie", movie_id);
+	}
+	
+	// crew_table에서 사람이름, 프로필 사진 조회
+	public List<CrewDTO> crewProfile(String movie_id) {
+		return session.selectList("crewProfile", movie_id);
+	}
+	
+	// image_table에서 포스터, 스틸컷 조회
+	public List<String> imagePS(ImageDTO dto) {
+		return session.selectList("imagePS", dto);
+	}
+	
+	// review count
+	public int reviewCount(String movie_id) {
+		return session.selectOne("reviewCount", movie_id);
+	}
+	
+	// review_table 조회
+	public List<ReviewDTO> reviewUserList(ReviewPagingDTO dto) {
+		return session.selectList("reviewUserList", dto);
+	}
+	
+	// review update
+	public void reviewUpdate(ReviewDTO dto) {
+		session.selectOne("reviewUpdate", dto);
+	}
+	
+	
+	/// DB Test 기능
 	// user_table 조회
 	public List<UserDTO> userList() {
 		return session.selectList("userList");
@@ -31,19 +66,9 @@ public class DetailedDAO {
 		return session.selectList("crewList");
 	}
 	
-	// movie_id로 movie_table 조회
-	public MovieDTO oneMovie(String movie_id) {
-		return session.selectOne("oneMovie", movie_id);
-	}
-	
 	// image_table insert
 	public void insertImageTable(ImageDTO dto) {
 		session.selectOne("insertImageTable", dto);
-	}
-	
-	// image_table에서 포스터, 스틸컷 조회
-	public List<String> imagePS(ImageDTO dto) {
-		return session.selectList("imagePS", dto);
 	}
 	
 	// crew_table insert
@@ -51,8 +76,8 @@ public class DetailedDAO {
 		session.selectOne("insertCrewTable", dto);
 	}
 	
-	// crew_table에서 사람이름, 프로필 사진 조회
-	public List<CrewDTO> crewProfile(String movie_id) {
-		return session.selectList("crewProfile", movie_id);
+	// review_table insert
+	public void insertReviewTable(ReviewDTO dto) {
+		session.selectOne("insertReviewTable", dto);
 	}
 }
