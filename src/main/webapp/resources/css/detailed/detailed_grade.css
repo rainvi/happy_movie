@@ -85,11 +85,11 @@
     width: 80px;
 }
 #comment_sort {
-    margin-top: 30px;
+    margin-top: 45px;
+    margin-bottom: 30px;
 }
 #comment_sort *{
-    font-size: 17px;
-    color: white;
+    font-size: 18px;
     background-color: black;
     border: none;
 }
@@ -144,16 +144,8 @@
 }
 .change_input {
     width: 100px;
-}
-.change_input * {
-    width: 100px;
     font-size: 18px;
     color: #d8b1f9;
-    background-color: black;
-    caret-color: white;
-    border: none;
-    border-bottom: 1px solid white;
-    outline: none;
 }
 #change_star {
     font-size: 20px;
@@ -164,7 +156,6 @@
     outline: none;
 }
 #change_comment {
-    width: 750px;
     font-size: 16px;
     color: white;
     background-color: black;
@@ -172,11 +163,17 @@
     border: none;
     outline: none;
 }
-.sort_btn {
+.sort_btn, .page_a {
 	color: #5F5F5F;
 	font-weight: normal;
 }
 .sort_active {
 	color: white;
 	font-weight: bold;
+}
+.page_a {
+	font-size: 18px;
+}
+#page_nums {
+	margin-left: 400px;
 }

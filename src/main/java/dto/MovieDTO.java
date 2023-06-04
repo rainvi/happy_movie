@@ -14,6 +14,8 @@ public class MovieDTO {
 	private String rating_age;
 	private String img_url;
 	private String synopsis;
+	private double star;
+	
 	public String getMovie_id() {
 		return movie_id;
 	}
@@ -91,6 +93,12 @@ public class MovieDTO {
 	}
 	public void setSynopsis(String synopsis) {
 		this.synopsis = synopsis;
+	}
+	public double getStar() {
+		return star;
+	}
+	public void setStar(double star) {
+		this.star = star;
 	}
 	
 	

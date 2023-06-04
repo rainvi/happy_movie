@@ -13,14 +13,18 @@
 			let key = "736697ae7e8ff21f7f31778b2d47a87d";
 			
 			// 어제 날짜
-	        let yesterday = new Date();
-	        yesterday.setDate(yesterday.getDate() - 1);
+	        let day = new Date();
+	        day.setDate(day.getDate() - 1);
 	        let options = {
 	        		year: "numeric",
 	        		month: "2-digit",
 	        		day: "2-digit"
 	        };
-	        let targetDt = yesterday.toLocaleDateString('ko-KR', options).replace(/\./g, "").replace(/\s/g, "");
+	        let targetDt = day.toLocaleDateString('ko-KR', options).replace(/\./g, "").replace(/\s/g, "");
+	        
+	        // 일주일 전 날짜
+	        day.setDate(day.getDate() - 7);
+	        let targetDtY = day.toLocaleDateString('ko-KR', options).replace(/\./g, "").replace(/\s/g, "");
 	        
 			// 일별 박스오피스 순위 API data load
 			$.ajax({
@@ -34,12 +38,27 @@
 					let movieNmArr = [];	// 영화 제목
 					
 					for (let i = 0; i < boxData.length; i++) {
-						$("#boxForm").append("<input type='checkbox' id='cd" + (i+1) + "' name='cds' value='" 
-								+ boxData[i].movieCd + "' checked />");
-						$("#boxForm").append("<label for='cd" + (i+1) + "'>" + boxData[i].movieCd + "</label>&nbsp;");
-						$("#boxForm").append("<input type='checkbox' id='nm" + (i+1) + "' name='nms' value='"
-								+ boxData[i].movieNm + "' checked />");
-						$("#boxForm").append("<label for='nm" + (i+1) + "'>" + boxData[i].movieNm + "</label><br>");
+						$("#boxForm").append(boxData[i].movieCd + "&nbsp;|&nbsp;" 
+							+ (i+1) + "위&nbsp;|&nbsp;" + boxData[i].movieNm + "<br>");
+					}
+				}	// success end
+			});	// ajax end
+			
+			// 주간 박스오피스 순위 API data load
+			$.ajax({
+				type: "get",
+				url: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key="
+						+ key + "&targetDt=" + targetDtY + "&weekGb=0",
+				success: function(data) {
+					$("#weekH1").text(targetDtY + " 주간 박스오피스 순위");
+					
+					let boxData = data.boxOfficeResult.weeklyBoxOfficeList;
+					let movieCdArr = [];	// 영화 코드
+					let movieNmArr = [];	// 영화 제목
+					
+					for (let i = 0; i < boxData.length; i++) {
+						$("#weekForm").append(boxData[i].movieCd + "&nbsp;|&nbsp;" 
+								+ (i+1) + "위&nbsp;|&nbsp;" + boxData[i].movieNm + "<br>");
 					}
 				}	// success end
 			});	// ajax end
@@ -49,5 +68,9 @@
 <body>
 	<h1 id="boxH1"></h1>
 	<div id="boxForm"></div>
+	<hr>
+	
+	<h1 id="weekH1"></h1>
+	<div id="weekForm"></div>
 </body>
 </html>

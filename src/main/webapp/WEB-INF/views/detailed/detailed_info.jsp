@@ -15,7 +15,7 @@
     <script src="resources/js/detailed/detailed_main.js"></script>
     <script>
 		/// Model Data
-		let movieCd = ${ movie_id };
+		let movieCd = ${ movie_dto.movie_id };
 		
 		// Function
 		function tryLogin() {
@@ -203,10 +203,10 @@
     </div>
 
     <div id="main_btns">
-        <input id="info_btn" class="main_btns active" type="button" data-url="detailed" value="정보">
-        <input id="person_btn" class="main_btns" type="button" data-url="detailedperson" value="인물">
-        <input id="photo_btn" class="main_btns" type="button" data-url="detailedphoto" value="사진">
-        <input id="grade_btn" class="main_btns" type="button" data-url="detailedgrade" value="평점">
+        <input id="info_btn" class="main_btns active" type="button" data-url="detailed?movie_id=${ movie_dto.movie_id }" value="정보">
+        <input id="person_btn" class="main_btns" type="button" data-url="detailedperson?movie_id=${ movie_dto.movie_id }" value="인물">
+        <input id="photo_btn" class="main_btns" type="button" data-url="detailedphoto?movie_id=${ movie_dto.movie_id }" value="사진">
+        <input id="grade_btn" class="main_btns" type="button" data-url="detailedgrade?movie_id=${ movie_dto.movie_id }" value="평점">
     </div>
 
     <div id="info_contents" class="contents">

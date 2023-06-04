@@ -1,3 +1,5 @@
+<%@page import="dto.ReviewPagingDTO"%>
+<%@page import="dto.MovieDTO"%>
 <%@page import="dto.ReviewDTO"%>
 <%@page import="dto.CrewDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -16,7 +18,7 @@
     <script src="resources/js/detailed/detailed_main.js"></script>
     <script>
 		/// Model Data
-		let movieCd = ${ movie_id };
+		let movieCd = ${ movie_dto.movie_id };
 		
 		// Model-review Data
 		// 리뷰 생성자
@@ -268,8 +270,9 @@
 
 		    // sort event
 		    $(".sort_btn[data-target='" + "${ sort_type }" + "']").addClass("sort_active");
+		    $(".page_a:contains('" + ${ page } + "')").addClass("sort_active");
 		    $(".sort_btn").on("click", function() {
-		        window.location.href = "detailedgrade?sort_type=" + $(this).data("target");
+		        window.location.href = "detailedgrade?movie_id=" + ${ movie_dto.movie_id } + "&sort_type=" + $(this).data("target");
 		    });
 	        grade_arr.forEach((g) => {
 	            $("#comment_list").append("<li id='c_li" + g.seq + "' data-seq='" + g.seq + "'>" + g.print() + "</li>");
@@ -297,11 +300,12 @@
 		    $(document).on("click", ".pw_btn", function() {
 		        if ($("#pw_confirm" + this_seq).val() == find_pw) {
 		            if (what_btn == "수정") {
-		                $(this).closest("table").html("<tr>"
-		                        + "<td class='change_input'><input id='change_name' type='text' value='" + find_data.name + "'></td>"
-		                        + "<td class='change_input'><input id='change_pw' type='password' value='" + find_data.pw + "'></td>"
+		                $(this).closest("li").html("<form action='detailedgrade?movie_id=" + ${ movie_dto.movie_id } + "' method='post'>"
+		                	+ "<table style='padding: 10px; border: 2px solid #52057B'>"
+		                	+ "<tr>"
+		                        + "<td class='change_input'>" + find_data.name + "</td>"
 		                        + "<td class='inner_star'>"
-		                            + "<select id='change_star'>"
+		                            + "<select id='change_star' name='rating_star'>"
 		                                + "<option value='1'>★1</option>"
 		                                + "<option value='2'>★2</option>"
 		                                + "<option value='3'>★3</option>"
@@ -317,14 +321,18 @@
 		                    + "</tr>"
 		                    + "<tr>"
 		                        + "<td colspan='3'>"
-		                        	+ "<textarea id='change_comment' rows='4' cols='80'>" + find_data.comment + "</textarea>"
+		                        	+ "<textarea id='change_comment' name='contents' rows='4' cols='50' style='width: 800px;'>" 
+		                        		+ find_data.comment
+		                        	+ "</textarea>"
 		                        + "</td>"
 		                    + "</tr>"
 		                    + "<tr>"
 		                    	+ "<td class='inner_btn' colspan='3'>"
-		                    		+ "<input class='comment_table_btn change_confirm_btn' type='button' value='수정완료'>"
+		                    		+ "<input class='comment_table_btn change_confirm_btn' type='submit' value='수정완료'>"
 		                        + "</td>"
-		                    + "</tr>"
+		                    + "</tr></table>"
+		                    + "<input type='text' name='seq' value='" + this_seq + "'>"
+		                    + "</form>"
 		                );
 		                $("#change_star").val(find_data.star.toString()).prop("selected", true);
 		            }
@@ -351,25 +359,7 @@
 		                + "<input class='comment_table_btn delete_btn' type='button' value='삭제'>"
 		            );
 		        }
-		    });
-
-		    // change confirm
-		    $(document).on("click", ".change_confirm_btn", function() {
-		        find_data.name = $("#change_name").val();
-		        find_data.pw = $("#change_pw").val();
-		        find_data.comment = $("#change_comment").val();
-		        find_data.star = parseInt($("#change_star").val());
-		        find_data.date = new Date().toLocaleString('ko-KR', {
-		            year: 'numeric', 
-		            month: 'numeric', 
-		            day: 'numeric', 
-		            hour: '2-digit', 
-		            minute:'2-digit',
-		            hour12: false});
-
-		        $("#c_li" + this_seq).html(find_data.print());
-		        AvgGrade();
-		    }); // review event end
+		    });		// review event end
 		});	// document end
     </script>
     <title id="detailed_title"></title>
@@ -420,16 +410,16 @@
     </div>
 
     <div id="main_btns">
-        <input id="info_btn" class="main_btns" type="button" data-url="detailed" value="정보">
-        <input id="person_btn" class="main_btns" type="button" data-url="detailedperson" value="인물">
-        <input id="photo_btn" class="main_btns" type="button" data-url="detailedphoto" value="사진">
-        <input id="grade_btn" class="main_btns active" type="button" data-url="detailedgrade" value="평점">
+        <input id="info_btn" class="main_btns" type="button" data-url="detailed?movie_id=${ movie_dto.movie_id }" value="정보">
+        <input id="person_btn" class="main_btns" type="button" data-url="detailedperson?movie_id=${ movie_dto.movie_id }" value="인물">
+        <input id="photo_btn" class="main_btns" type="button" data-url="detailedphoto?movie_id=${ movie_dto.movie_id }" value="사진">
+        <input id="grade_btn" class="main_btns active" type="button" data-url="detailedgrade?movie_id=${ movie_dto.movie_id }" value="평점">
     </div>
     
 	<div id="grade_contents" class="contents">
         <div id="grade_title">
             <h1><img class="bar" src="resources/images/Bar.svg">평점</h1>
-            <h2>★8.8점(10개)</h2>
+            <h2>★${ movie_dto.star }점(${ cnt }개)</h2>
         </div>
         <div id="write_comment">
             <div id="write_title">
@@ -450,29 +440,42 @@
                 </div>
                 <p id="write_star">★10</p><br>
             </div>
-            <textarea id="write_text" class="is_write" name="댓글" rows="4" cols="80">댓글을 입력하세요.</textarea>
+            <c:choose>
+            	<c:when test="${ sessionid != null }">
+            		<textarea id="write_text" class="is_write" name="contents" rows="4" cols="80">댓글을 입력하세요.</textarea>
+            	</c:when>
+            	<c:otherwise>
+            		<textarea id="write_text" class="is_write" name="contents" rows="4" cols="80" readonly>로그인 후에 작성할 수 있습니다.</textarea>
+            	</c:otherwise>
+            </c:choose>
             <div id="write_end">
                 <p id="text_th">0/100</p>
                 <input id="write_btn" type="button" value="등록">
             </div>
         </div>
         <div id="comment_sort">
-            <input class="sort_btn" data-target="date" id="sort_date_btn" type="button" value="최신순">
+            <input class="sort_btn" data-target="date" type="button" value="최신순" id="why">
             <input class="sort_btn" data-target="star" type="button" value="별점순">
         </div>
         <ul id="comment_list"></ul>
-        <%
+        <div id="page_nums">
+        <%	
+        	MovieDTO movie_dto = (MovieDTO)request.getAttribute("movie_dto");
+        	String movie_id = movie_dto.getMovie_id();
         	String sort_type = (String)request.getAttribute("sort_type");
-        	int cnt = (Integer)request.getAttribute("cnt");
         	int divNum = (Integer)request.getAttribute("divNum");
+        	int cnt = (Integer)request.getAttribute("cnt");
         	int totalPage = cnt / divNum;
         	
         	if (cnt % divNum != 0)
         		totalPage++;
         	
         	for (int p = 1; p <= totalPage; p++)
-        		out.println("<a href=\"detailedgrade?sort_type=" + sort_type + "&page=" + p + "\">" + p + "</a> ");
+        		out.println("&nbsp;<a class='page_a'"
+        			+ " href=\"detailedgrade?movie_id=" + movie_id + "&sort_type=" + sort_type + "&page=" + p + "\">"
+        			+ p + "</a>&nbsp;");
         %>
+        </div>
     </div>
 
     <footer>

@@ -16,7 +16,7 @@
 <body>
 	<h1>image_table insert</h1>
 	<form action="detaileddbinsertimage" method="post">
-		영화코드 <input type="text" name="movie_id" value="20231496"><br>
+		영화코드 <input type="text" name="movie_id" value="19960041"><br>
 		URL <input type="text" name="img_url" style="width:500px;"><br>
 		타입
 		<select name="img_type">
@@ -28,7 +28,7 @@
 	
 	<h1>crew_table insert</h1>
 	<form action="detaileddbinsertcrew" method="post">
-		영화코드 <input type="text" name="movie_id" value="20090860"><br>
+		영화코드 <input type="text" name="movie_id" value="19960041"><br>
 		이름 <input type="text" name="name"><br>
 		URL <input type="text" name="profile_url" style="width:500px;"><br>
 		<input type="submit">

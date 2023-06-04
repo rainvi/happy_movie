@@ -72,12 +72,10 @@ public class DetailedDBController {
 	
 	@RequestMapping("/detaileddbinsertreview")
 	public ModelAndView detailedDBInsertReview(ReviewDTO dto) {
+		ModelAndView mv = new ModelAndView();
 		String user_id[] = {"gwon", "hwang", "moon", "member1", "member2", "member3", "member4", "member5", "member6", "member7", "member8", "member9"};
-		String contents[] = {"노잼",
-				"영화를 보는 내내 시간이 아까웠다.",
-				"기대했는데 실망했어요.",
+		String contents[] = {
 				"인생이 아주 재미없을 때 보면 재밌을수도",
-				"그냥저냥 볼만함",
 				"배우들 연기는 좋으나 연출은 별로, 스토리는 재미있었음",
 				"소소하게 재미있었어요!",
 				"꿀잼",
@@ -94,21 +92,25 @@ public class DetailedDBController {
 				"2023-06-02 20:12:00",
 				"2023-06-03 17:24:00",
 				"2023-06-04 03:51:00"};
-
-		for (String u : user_id) {
-			int randC = (int)(Math.random() * 10);
-			int randD = (int)(Math.random() * 10);
-			
-			dto.setUser_id(u);
-			dto.setContents(contents[randC]);
-			dto.setRating_star(randC+1);
-			dto.setWriting_time(date[randD]);
-			
-			service.insertReviewTable(dto);
+		int cnt = service.reviewCount(dto.getMovie_id());
+		if (cnt == 0 && dto.getMovie_id() != null) {
+			for (String u : user_id) {
+				int randC = (int)(Math.random() * 6);
+				int randD = (int)(Math.random() * 10);
+				
+				dto.setUser_id(u);
+				dto.setContents(contents[randC]);
+				dto.setRating_star(randC + 5);
+				dto.setWriting_time(date[randD]);
+				
+				service.insertReviewTable(dto);
+				mv.addObject("insertresult", "review_table insert 성공");	
+			}			
 		}
-		
-		ModelAndView mv = new ModelAndView();
-		mv.addObject("insertresult", "review_table insert 성공");		
+		else {
+			mv.addObject("insertresult", "review_table insert 실패");				
+		}
+			
 		mv.setViewName("detailed/detailed_db_insert");
 		return mv;
 	}

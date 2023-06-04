@@ -49,6 +49,15 @@ public class DetailedDAO {
 		session.selectOne("reviewUpdate", dto);
 	}
 	
+	// review rating_star avg
+	public double reviewStarAvg(String movie_id) {
+		return session.selectOne("reviewStarAvg", movie_id);
+	}
+	
+	// movie star update
+	public void reviewStarUpdate(MovieDTO dto) {
+		session.selectOne("reviewStarUpdate", dto);
+	}
 	
 	/// DB Test 기능
 	// user_table 조회

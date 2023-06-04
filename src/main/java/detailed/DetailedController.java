@@ -19,47 +19,12 @@ public class DetailedController {
 	@Autowired
 	DetailedService service;
 	
-	// @RequestMapping("/detailed")
-//	public ModelAndView detailed(@RequestParam(value="movie_id", required=false, defaultValue="20226411") String movie_id) {
-//		// MovieDTO 생성
-//		MovieDTO movie_dto = service.oneMovie(movie_id);
-//		
-//		// poster_list 생성
-//		ImageDTO posterdto = new ImageDTO();
-//		posterdto.setMovie_id(movie_id);
-//		posterdto.setImg_type('p');		
-//		List<String> poster_list = service.imagePS(posterdto);
-//		
-//		// still_list 생성
-//		ImageDTO stilldto = new ImageDTO();
-//		stilldto.setMovie_id(movie_id);
-//		stilldto.setImg_type('s');
-//		List<String> still_list = service.imagePS(stilldto);
-//		
-//		// crew_list 생성
-//		List<CrewDTO> crew_list = service.crewProfile(movie_id);
-//		
-//		// review_list 생성
-//		List<ReviewDTO> review_list = service.reviewUserList(movie_id);
-//		
-//		ModelAndView mv = new ModelAndView();
-//		mv.addObject("movie_id", movie_id);
-//		mv.addObject("movie_dto", movie_dto);
-//		mv.addObject("poster_list", poster_list);
-//		mv.addObject("still_list", still_list);
-//		mv.addObject("crew_list", crew_list);
-//		mv.addObject("review_list", review_list);
-//		mv.setViewName("detailed/detailed");
-//		return mv;
-//	}
-	
 	@RequestMapping("/detailed")
 	public ModelAndView detailedInfo(@RequestParam(value="movie_id", required=false, defaultValue="20226411") String movie_id) {
 		// MovieDTO 생성
 		MovieDTO movie_dto = service.oneMovie(movie_id);
 		
 		ModelAndView mv = new ModelAndView();
-		mv.addObject("movie_id", movie_id);
 		mv.addObject("movie_dto", movie_dto);
 		mv.setViewName("detailed/detailed_info");
 		return mv;
@@ -74,7 +39,6 @@ public class DetailedController {
 		List<CrewDTO> crew_list = service.crewProfile(movie_id);
 		
 		ModelAndView mv = new ModelAndView();
-		mv.addObject("movie_id", movie_id);
 		mv.addObject("movie_dto", movie_dto);
 		mv.addObject("crew_list", crew_list);
 		mv.setViewName("detailed/detailed_person");
@@ -99,7 +63,6 @@ public class DetailedController {
 		List<String> still_list = service.imagePS(stilldto);
 		
 		ModelAndView mv = new ModelAndView();
-		mv.addObject("movie_id", movie_id);
 		mv.addObject("movie_dto", movie_dto);
 		mv.addObject("poster_list", poster_list);
 		mv.addObject("still_list", still_list);
@@ -108,9 +71,12 @@ public class DetailedController {
 	}
 	
 	@RequestMapping("/detailedgrade")
-	public ModelAndView detailedGrade(@RequestParam(value="movie_id", required=false, defaultValue="20226411") String movie_id,
-			@RequestParam(value="sort_type", required=false, defaultValue="date") String sort_type,
-			@RequestParam(value="page", required=false, defaultValue="1") int page) {
+	public ModelAndView detailedGrade(@RequestParam(value="movie_id", defaultValue="20226411") String movie_id,
+			@RequestParam(value="sort_type", defaultValue="date") String sort_type,
+			@RequestParam(value="page", defaultValue="1") int page,
+			@RequestParam(value="seq", defaultValue="0") int seq,
+			@RequestParam(value="rating_star", defaultValue="0") int rating_star,
+			@RequestParam(value="contents", required=false) String contents) {
 		// MovieDTO 생성
 		MovieDTO movie_dto = service.oneMovie(movie_id);
 		
@@ -131,11 +97,30 @@ public class DetailedController {
 			paging_dto.setSort_type("writing_time");
 		}
 		
+		// ReviewDTO 생성
+		if (seq != 0) {
+			ReviewDTO review_dto = new ReviewDTO();
+			review_dto.setSeq(seq);
+			review_dto.setContents(contents);
+			review_dto.setRating_star(rating_star);
+			
+			service.reviewUpdate(review_dto);
+		}
+		
 		// review_list 생성
 		List<ReviewDTO> review_list = service.reviewUserList(paging_dto);
 		
+		// review_avg 생성
+		double review_avg = 0.0;
+		
+		if (cnt != 0) {
+			review_avg = service.reviewStarAvg(movie_id);
+			review_avg = Math.round(review_avg * 10) / 10.0;
+		}
+		movie_dto.setStar(review_avg);
+		service.reviewStarUpdate(movie_dto);
+		
 		ModelAndView mv = new ModelAndView();
-		mv.addObject("movie_id", movie_id);
 		mv.addObject("movie_dto", movie_dto);
 		mv.addObject("review_list", review_list);
 		mv.addObject("sort_type", sort_type);

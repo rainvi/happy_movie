@@ -16,7 +16,7 @@
 	</select>
 	
 	<select id="oneMovie" parameterType="String" resultType="moviedto">
-		select rating_star, img_url, synopsis from movie_table where movie_id=#{movie_id}
+		select movie_id, rating_star, img_url, synopsis from movie_table where movie_id=#{movie_id}
 	</select>
 	
 	<select id="imagePS" parameterType="imagedto" resultType="String">
@@ -34,6 +34,12 @@
 		where movie_id=#{movie_id}
 		order by ${sort_type} desc
 		limit #{start}, #{end}
+	</select>
+	
+	<select id="reviewStarAvg" parameterType="String" resultType="double">
+		select avg(rating_star)
+		from review_table
+		where movie_id=#{movie_id}
 	</select>
 	
 	<select id="reviewCount" parameterType="String" resultType="int">
@@ -61,6 +67,12 @@
 		update review_table
 		set contents=#{contents}, rating_star=#{rating_star}, writing_time=now()
 		where seq=#{seq}	
+	</update>
+	
+	<update id="reviewStarUpdate" parameterType="moviedto">
+		update movie_table
+		set star=#{star}
+		where movie_id=#{movie_id}
 	</update>
 	
 </mapper>
