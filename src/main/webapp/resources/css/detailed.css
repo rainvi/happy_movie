@@ -84,6 +84,23 @@ header {
 }
 
 /* main_poster */
+.bookmark_img {
+	position : absolute;
+	top: 110px;
+}
+.bookmark_img:hover{
+	transform: scale(1.5);
+}
+.b_on {
+	left: 35px;
+	width : 50px;
+	height : 55px;
+}
+.b_off {
+	left: 40px;
+	width : 40px;
+	height : 45px;
+}
 #main_poster {
     position: absolute;
     top: 120px;
@@ -198,7 +215,7 @@ h1 {
     color: #5F5F5F;
 }
 .not_profile td:nth-child(2) {
-    width: 300px;
+    width: 400px;
     font-size: 18px;
 }
 
@@ -221,13 +238,11 @@ h1 {
     border-radius: 10px;
 }
 #posters_table img {
-    width: 130px;
-    height: 195px;
+    max-width: 130px;
     border-radius: 10px;
 }
 #stills_table img {
-    width: 260px;
-    height: 130px;
+    max-width: 260px;
     border-radius: 10px;
 }
 .more_btns, .close_btns, #write_end input {

@@ -1,14 +1,14 @@
 package dto;
 
 public class ImageDTO {
-	private int movie_id;
+	private String movie_id;
 	private String img_url;
 	private char img_type;
 	
-	public int getMovie_id() {
+	public String getMovie_id() {
 		return movie_id;
 	}
-	public void setMovie_id(int movie_id) {
+	public void setMovie_id(String movie_id) {
 		this.movie_id = movie_id;
 	}
 	public String getImg_url() {

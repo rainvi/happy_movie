@@ -1,28 +1,4 @@
 /// Data
-// person arr
-let director = [
-    {name: "아론 호바스", profile: "aaron.png"}, 
-    {name: "마이클 젤레닉", profile: "none_profile.png"}
-];
-let actor = [
-    {name: "크리스 프랫", role: "마리오", profile: "chris.png"},
-    {name: "안야 테일러 조이", role: "피치 공주", profile: "anya.png"},
-    {name: "잭 블랙", role: "바우저", profile: "jack.png"},
-    {name: "세스 로건", role: "동키 콩", profile: "seth.png"},
-    {name: "찰리 데이", role: "루이지", profile: "charlie.png"},
-    {name: "키건 마이클 키", role: "토드", profile: "keegan.png"},
-];
-let crew = [
-    {name: "크리스토퍼 멜레단드리", role: "제작"},
-    {name: "미야모토 시게루", role: "기획"},
-    {name: "매튜 포겔", role: "각본"},
-    {name: "기욤 아레토스", role: "미술"}
-];
-let company = [
-    {name: "유니버설 픽쳐스", role: "배급"},
-    {name: "유니버설 픽쳐스", role: "수입"}
-];
-
 // photos arr
 let posters = Array.from({length: 13}, (v, i) => `poster${i}.jfif`);
 let stills = Array.from({length: 18}, (v, i) => `still${i}.jfif`);
@@ -132,33 +108,26 @@ $(document).ready(function() {
 
     /// Main
     AvgGrade();
+    
+    // bookmark_img
+	$(".bookmark_img").click(function(){
+		if($(this).attr("alt") == "bookmarkOn") {
+			$(this).attr({
+				"class": "bookmark_img b_off",
+				"alt": "bookmarkOff",
+				"src": "resources/images/bookmarkOff.svg"
+			});
+		}
+		else {
+			$(this).attr({
+				"class": "bookmark_img b_on",
+				"alt": "bookmarkOn",
+				"src": "resources/images/bookmarkOn.svg"
+			});
+		}
+	});
 
     /// Contents
-    // person contents
-    director.forEach(d => {
-        $("#director_table tr:nth-child(1)").append(`<td><img src='resources/images/profiles/${d.profile}'></td>`);
-        $("#director_table tr:nth-child(2)").append(`<td>${d.name}</td>`);
-    });
-    actor.forEach(a => {
-        $("#actor_table tr:nth-child(1)").append(`<td><img src='resources/images/profiles/${a.profile}'></td>`);
-        $("#actor_table tr:nth-child(2)").append(`<td>${a.name}</td>`);
-        $("#actor_table tr:nth-child(3)").append(`<td>${a.role} 역</td>`);
-    });
-    crew.forEach(c => {
-        $("#crew_table").append(`<tr><td>${c.role}</td><td>${c.name}</td></tr>`);
-    });
-    company.forEach(c => {
-        $("#company_table").append(`<tr><td>${c.role}</td><td>${c.name}</td></tr>`);
-    });
-
-    // photo contents
-    posters.slice(0, 9).forEach(p => {
-        $("#posters_table").append(`<td><img src='resources/images/photos/posters/${p}'></td>`);
-    });
-    stills.slice(0, 5).forEach(s => {
-        $("#stills_table").append(`<td><img src='resources/images/photos/stills/${s}'></td>`);
-    });
-
     // find footer top
     let FooterTop = function(end) {
         $("footer").css("top", end);
@@ -178,38 +147,6 @@ $(document).ready(function() {
         let target = $(this).data("target");
         $(target).css("display", "none");
         $("#photo_contents").css("display", "block");
-    });
-
-    /// Photo event
-    // more button event
-    function ShowPhotoSlide(photo_type, photo_arr) {
-        let index = 0;
-        let big_img = $(`#big_${photo_type}`);
-        $(`#${photo_type}_more_title h3`).text(`1/${photo_arr.length}`);
-        big_img.attr("src", `resources/images/photos/${photo_type}/${photo_arr[index]}`);
-
-        $(".prev_btn").on("click", function() {
-            index = (index + photo_arr.length - 1) % photo_arr.length;
-            $(`#${photo_type}_more_title h3`).text(`${index + 1}/${photo_arr.length}`);
-            big_img.fadeOut(150, function() {
-                big_img.attr("src", `resources/images/photos/${photo_type}/${photo_arr[index]}`);
-                big_img.fadeIn(150);
-            });
-        });
-        $(".next_btn").on("click", function() {
-            index = (index + 1) % photo_arr.length;
-            $(`#${photo_type}_more_title h3`).text(`${index + 1}/${photo_arr.length}`);
-            big_img.fadeOut(150, function() {
-                big_img.attr("src", `resources/images/photos/${photo_type}/${photo_arr[index]}`);
-                big_img.fadeIn(150);
-            });
-        });
-    };
-    $("#posters_more").on("click", function() {
-        ShowPhotoSlide("posters", posters);
-    });
-    $("#stills_more").on("click", function() {
-        ShowPhotoSlide("stills", stills);
     });
 
     /// Grade event
