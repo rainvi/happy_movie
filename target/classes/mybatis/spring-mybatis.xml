@@ -17,7 +17,7 @@
 <!-- mybatis-config.xml, sql-mapping 위치 정보  -->
 <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 	<property name="dataSource" ref="dataSource" />
-	<property name="configLocation" value="classpath:rank/mybatis-config.xml" />
+	<property name="configLocation" value="classpath:mybatis/mybatis-config.xml" />
 	<property name="mapperLocations" value="classpath:rank/*-mapping.xml" />
 </bean>
 
