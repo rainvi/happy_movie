@@ -1,5 +1,8 @@
 package dao;
 import dto.BookmarkDTO;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public interface BookmarkDAOInt {
 	
@@ -10,6 +13,6 @@ public interface BookmarkDAOInt {
 	 * */
 	public void insertBookmark(BookmarkDTO bd); 
 	public void deleteBookmark(BookmarkDTO bd);
-	public BookmarkDTO[] selectBookmark(String user_id);
+	public List<BookmarkDTO> selectBookmark(String user_id);
 
 }
