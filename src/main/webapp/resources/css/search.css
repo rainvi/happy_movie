@@ -165,14 +165,49 @@ a{
     display : table-cell;
     color : white;
 }
+/*paging*/
+.page_wrap {
+	position : absolute;
+	left : 40%;
+	top: 1450px;
+	text-align:center;
+	font-size:0;
+ }
+.page_nation {
+	display:inline-block;
+}
+.page_nation .none {
+	display:none;
+}
+.page_nation a {
+	display:block;
+	margin:0 3px;
+	float:left;
+	border:1px solid #892CDC;
+	width:28px;
+	height:28px;
+	line-height:28px;
+	text-align:center;
+	background-color:black;
+	font-size:13px;
+	font-weight : bold;
+	color:#fff;
+	text-decoration:none;
+}
+.page_nation .arrow {
+	border:1px solid #ccc;
+}
 
-
+.page_nation a.active {
+	background-color:#892CDC;
+	color:#fff;
+	border:1px solid #892CDC;
+}
 /* footer */
 footer {
     position: absolute;
     height: 157px;
     width: 100%;
-    bottom : -50%;
     text-align: center;
 }
 footer p {
