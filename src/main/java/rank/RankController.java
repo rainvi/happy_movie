@@ -1,5 +1,9 @@
 package rank;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import dao.ApiDAO;
 import dto.ApiDTO;
+import kr.or.kobis.kobisopenapi.consumer.rest.KobisOpenAPIRestService;
+import kr.or.kobis.kobisopenapi.consumer.rest.exception.OpenAPIFault;
 
 @Controller
 public class RankController {
@@ -18,12 +26,71 @@ public class RankController {
 	ApiService service;
 	
 	@RequestMapping("/rank")
-	public String rank() {
-		return "rank/rank";
+	public ModelAndView rank() throws OpenAPIFault, Exception {
+		Date currentDate = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+		String target = String.valueOf((Integer.parseInt(formatter.format(currentDate))-1));
+		
+		String targetDt = target;		//조회일자
+		String itemPerPage = "10";		//결과row수
+		String multiMovieYn = "";		//“Y” : 다양성 영화 “N” : 상업영화 (default : 전체)
+		String repNationCd = "";			//“K: : 한국영화 “F” : 외국영화 (default : 전체)
+		String wideAreaCd = "";				//“0105000000” 로서 조회된 지역코드
+		String curPage = "1";					//현재페이지
+		String movieNm = "";						//영화명
+		String directorNm = "";				//감독명
+		String openStartDt = "";			//개봉연도 시작조건 ( YYYY )
+		String openEndDt = "";				//개봉연도 끝조건 ( YYYY )	
+		String prdtStartYear ="";	//제작연도 시작조건 ( YYYY )
+		String prdtEndYear = "";			//제작연도 끝조건    ( YYYY )
+		String[] movieTypeCdArr = null;	//영화형태코드 배열 (공통코드서비스에서 '2201'로 조회된 영화형태코드)
+		
+		// 발급키 3000회 제한
+		String key = "b3a0415f8ef2c7923070066015819d92";
+		/* String key = "bf2271f675c761c477ce7afc3b47bee1"; */
+		/* String key = "478bf317e87507fd04843638f4a1ea4a"; */
+		// KOBIS 오픈 API Rest Client를 통해 호출
+	    KobisOpenAPIRestService service2 = new KobisOpenAPIRestService(key);
+		
+	 	// 영화코드조회 서비스 호출 (boolean isJson, String curPage, String itemPerPage,String directorNm, String movieCd, String movieNm, String openStartDt,String openEndDt, String ordering, String prdtEndYear, String prdtStartYear, String repNationCd, String[] movieTypeCdArr)
+	    String movieCdResponse = service2.getMovieList(true, curPage, itemPerPage, movieNm, directorNm, openStartDt, openEndDt, prdtStartYear, prdtEndYear, repNationCd, movieTypeCdArr);
+		
+	 	// 일일 박스오피스 서비스 호출 (boolean isJson, String targetDt, String itemPerPage,String multiMovieYn, String repNationCd, String wideAreaCd)
+	    String dailyResponse = service2.getDailyBoxOffice(true,targetDt,itemPerPage,multiMovieYn,repNationCd,wideAreaCd);
+		
+		// Json 라이브러리를 통해 Handling
+		ObjectMapper mapper = new ObjectMapper();
+		HashMap<String,Object> dailyResult = mapper.readValue(dailyResponse, HashMap.class);
+		
+		HashMap<String,Object> result = mapper.readValue(movieCdResponse, HashMap.class);
+	    /* System.out.println(result); */
+		// KOBIS 오픈 API Rest Client를 통해 코드 서비스 호출 (boolean isJson, String comCode )
+	
+		movieList movielist = new movieList();
+		ArrayList<ApiDTO> dtolist = new ArrayList();
+		ArrayList dailymovielist =  (ArrayList)((HashMap)dailyResult.get("boxOfficeResult")).get("dailyBoxOfficeList");
+		ArrayList ratelist = new ArrayList();
+		for(Object dailymovie : dailymovielist) {
+			HashMap dailymap = (HashMap)dailymovie;
+			int movieCd = Integer.parseInt(dailymap.get("movieCd").toString());
+			ApiDTO dto = service.selectMovie(movieCd);
+			dtolist.add(dto);
+			ratelist.add(dailymap.get("salesShare"));
+		}
+
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("ratelist",ratelist);
+		mv.addObject("dtolist",dtolist);
+		mv.setViewName("rank/rank");
+		return mv;
 	}
 	@RequestMapping("/grade")
-	public String grade() {
-		return "rank/grade";
+	public ModelAndView grade() {
+		List<ApiDTO> dtolist = service.selectGrade();
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("dtolist",dtolist);
+		mv.setViewName("rank/grade");
+		return mv;
 	}
 	
 	@RequestMapping("genrelist")

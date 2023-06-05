@@ -1,3 +1,8 @@
+
+<%@page import="java.util.Date"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="dto.ApiDTO"%>
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -10,7 +15,7 @@
 	<meta name="referrer" content="no-referrer" />
 	<title>RANK | HAPPYMOVIE</title>
 	<link href = "resources/images/MainIcon.ico" rel = "shortcut icon">
-	<link href = "resources/css/rank.css?v=5" rel = "stylesheet">
+	<link href = "resources/css/rank.css?v=6" rel = "stylesheet">
 	<script src="resources/js/jquery-3.6.4.min.js"></script>
 	<script>
 		$(document).ready(function() {
@@ -58,56 +63,109 @@
         
         
         <div class="content">
-<%ArrayList totalArray = (ArrayList)session.getAttribute("totalArray"); %>
+<%ArrayList dtolist = (ArrayList)session.getAttribute("dto"); %>
 <%-- <%request.setAttribute("totalArray", totalArray); %> --%>
 <%-- <%System.out.println(totalArray); %> --%>
 <table class="grade table active">
-            <%int num = 1; %>
+            <%int num = 1; 
+            
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");%>	
             <tr>
-            <c:forEach items="${totalArray}" var="boxoffice" begin="0" end="4">
-				<td>
-					<div class="rank">
-						<%=num %>
-					</div>
-					<a href="detailed?movie_id=${boxoffice.movieCd}" >
-					<div class='inner_wrap'>
-                           <div class="inner_text">
-                               <span class="back"> <c:out value="${boxoffice.contents }"></c:out> </span>
-                           </div>
-                       </div> 
-                       </a>
-                       <div class='img_wrap'>
-                               <img referrerpolicy="no-referrer" src="${boxoffice.imgurl}" alt="영화포스터" class="img">
-                       </div>
-                       <h3><a href="detailed?movie_id=${boxoffice.movieCd}" ><c:out value="${boxoffice.movieNm }"/></a></h3>
-                       <p>평점 <span class='score'>${boxoffice.grade}</span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
-                       <p>개봉 <c:out value="${boxoffice.openDt }"/></p>
-				</td>	
-			<%num++; %>
-			</c:forEach>
+            	<c:forEach items="${dtolist}" var="dto" begin="0" end="4">
+					<%
+					ApiDTO dto1 = (ApiDTO)pageContext.getAttribute("dto"); 
+					Date date = inputFormat.parse(String.valueOf(dto1.getRelease_date()));
+		            String release_date = outputFormat.format(date);
+					%>
+					
+							<td>
+								<div class="rank">
+									<c:out value="<%=num %>"/>
+								</div>
+								<div class="rating_age">
+									<c:choose>
+									 	<c:when test="${dto.rating_age eq '전체관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_all.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '12세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_12.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '15세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_15.png">
+									 	</c:when>
+									 	<c:otherwise>
+									 		<img alt="관람등급" src="resources/images/age_19.png">
+									 	</c:otherwise>
+									</c:choose>
+								</div>
+								<a href="detailed?movie_id=${dto.movie_id}" >
+								<div class='inner_wrap'>
+		                            <div class="inner_text">
+		                                <span class="back"> ${dto.synopsis}</span>
+		                            </div>
+		                        </div> 
+		                        </a>
+		                        <div class='img_wrap'>
+		                        		<img referrerpolicy="no-referrer" src="${dto.img_url}" alt="영화포스터" class="img">
+		                        </div>
+		                        <h3><a href="detailed?movie_id=${dto.movie_id}" ><c:out value="${dto.kor_title }"/></a></h3>
+		                        <p>평론가평점 <span class='score'>${dto.rating_star}</span> 유저평점 <span>${dto.star}</span></p> 
+		                        <p>${dto.genre }</p>
+		                        <p>러닝타임 ${dto.running_time}분</p>
+		                        <p>개봉 <c:out value="<%=release_date %>"/></p>
+							</td>
+							<%-- <%totalArray.add(boxOfficeMap); %> --%>
+							<%num++; %>
+					</c:forEach>
 			</tr>
 			<tr>
-			<c:forEach items="${totalArray}" var="boxoffice" begin="5" end="10">
-				<td>
-					<div class="rank">
-						<%=num %>
-					</div>
-					<a href="detailed?movie_id=${boxoffice.movieCd}" >
-					<div class='inner_wrap'>
-                           <div class="inner_text">
-                               <span class="back"> <c:out value="${boxoffice.contents }"></c:out> </span>
-                           </div>
-                       </div> 
-                       </a>
-                       <div class='img_wrap'>
-                               <img referrerpolicy="no-referrer" src="${boxoffice.imgurl}" alt="영화포스터" class="img">
-                       </div>
-                       <h3><a href="detailed?movie_id=${boxoffice.movieCd}" ><c:out value="${boxoffice.movieNm }"/></a></h3>
-                       <p>평점 <span class='score'>${boxoffice.grade}</span> 예매율 <c:out value="${boxoffice.salesShare }"/>%</p>
-                       <p>개봉 <c:out value="${boxoffice.openDt }"/></p>
-				</td>	
-			<%num++; %>
-			</c:forEach>
+			<c:forEach items="${dtolist}" var="dto" begin="5" end="10">
+					<%
+					ApiDTO dto1 = (ApiDTO)pageContext.getAttribute("dto"); 
+					Date date = inputFormat.parse(String.valueOf(dto1.getRelease_date()));
+		            String release_date = outputFormat.format(date);
+					%>
+					
+							<td>
+								<div class="rank">
+									<c:out value="<%=num %>"/>
+								</div>
+								<div class="rating_age">
+									<c:choose>
+									 	<c:when test="${dto.rating_age eq '전체관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_all.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '12세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_12.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '15세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_15.png">
+									 	</c:when>
+									 	<c:otherwise>
+									 		<img alt="관람등급" src="resources/images/age_19.png">
+									 	</c:otherwise>
+									</c:choose>
+								</div>
+								<a href="detailed?movie_id=${dto.movie_id}" >
+								<div class='inner_wrap'>
+		                            <div class="inner_text">
+		                                <span class="back"> ${dto.synopsis}</span>
+		                            </div>
+		                        </div> 
+		                        </a>
+		                        <div class='img_wrap'>
+		                        		<img referrerpolicy="no-referrer" src="${dto.img_url}" alt="영화포스터" class="img">
+		                        </div>
+		                        <h3><a href="detailed?movie_id=${dto.movie_id}" ><c:out value="${dto.kor_title }"/></a></h3>
+		                        <p>평론가평점 <span class='score'>${dto.rating_star}</span> 유저평점 <span>${dto.star}</span></p>
+		                       	<p>${dto.genre }</p>
+		                       	<p>러닝타임 ${dto.running_time}분</p>
+		                        <p>개봉 <c:out value="<%=release_date %>"/></p>
+							</td>
+							<%-- <%totalArray.add(boxOfficeMap); %> --%>
+							<%num++; %>
+					</c:forEach>
 			</tr>
           	</table>
         </div>
@@ -119,6 +177,6 @@
         </P>
     
     </footer>
-    <script type="text/javascript" src="resources/js/rank.js?v=9"></script>
+    <script type="text/javascript" src="resources/js/rank.js?v=3"></script>
 </body>
 </html>

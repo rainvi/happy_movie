@@ -32,7 +32,9 @@ public class ApiService {
 	public int getTotalGenre(String genre) {
 		return dao.getTotalGenre(genre);
 	}
-
+	public ApiDTO selectMovie(int movieCd) {
+		return dao.selectMovie(movieCd);
+	}
 	public List<ApiDTO> actionList(int[] limit) {
 		 return dao.actionList(limit);
 	}
@@ -47,5 +49,8 @@ public class ApiService {
 	}
 	public List<ApiDTO> fantasyList(int[] limit) {
 		 return dao.fantasyList(limit);
+	}
+	public List<ApiDTO> selectGrade(){ 
+		return dao.selectGrade();
 	}
 }

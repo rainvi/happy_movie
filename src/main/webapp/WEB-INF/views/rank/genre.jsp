@@ -1,3 +1,6 @@
+<%@page import="dto.ApiDTO"%>
+<%@page import="java.util.Date"%>
+<%@page import="java.text.SimpleDateFormat"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -9,7 +12,7 @@
 	<meta name="referrer" content="no-referrer" />
 	<title>RANK | HAPPYMOVIE</title>
 	<link href = "resources/images/MainIcon.ico" rel = "shortcut icon">
-	<link href = "resources/css/rank.css?v=5" rel = "stylesheet">
+	<link href = "resources/css/rank.css?v=6" rel = "stylesheet">
 	<script src="resources/js/jquery-3.6.4.min.js"></script>
 	<script>
 		$(document).ready(function() {
@@ -49,11 +52,33 @@
         
         <div class="content">
         <table class="genre_table">
-            <%int num = 1; %>
+            <%int num = 1; 
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");%>
             <tr>
             <c:forEach items="${genreList}" var="dto" begin="0" end="4">
+            <% 
+            ApiDTO dto1 = (ApiDTO)pageContext.getAttribute("dto");
+            Date date = inputFormat.parse(String.valueOf(dto1.getRelease_date()));
+		    String release_date = outputFormat.format(date);%>
 				<td>
 					<a href="detailed?movie_id=${dto.movie_id}" >
+					<div class="rating_age">
+									<c:choose>
+									 	<c:when test="${dto.rating_age eq '전체관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_all.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '12세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_12.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '15세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_15.png">
+									 	</c:when>
+									 	<c:otherwise>
+									 		<img alt="관람등급" src="resources/images/age_19.png">
+									 	</c:otherwise>
+									</c:choose>
+								</div>
 					<div class='inner_wrap'>
                            <div class="inner_text">
                                <span class="back"> <c:out value="${dto.synopsis }"></c:out> </span>
@@ -64,15 +89,37 @@
                                <img referrerpolicy="no-referrer" src="${dto.img_url}" alt="영화포스터" class="img" onerror="this.src='resources/images/noimg.jpg';">
                        </div>
                        <h3><a href="detailed?movie_id=${dto.movie_id}" ><c:out value="${dto.kor_title }"/></a></h3>
-                       <p>평점 <span class='score'>${dto.rating_star}</span></p>
-                       <p>개봉 <c:out value="${dto.release_date }"/></p>
+                       <p>평론가평점 <span class='score'>${dto.rating_star}</span> 유저평점 <span>${dto.star}</span></p>
+                       <p>국가 ${dto.country }</p>
+                       <p>러닝타임 ${dto.running_time}분</p>
+                       <p>개봉 <c:out value="<%=release_date %>"/></p>
 				</td>	
 			</c:forEach>
 			</tr>
 			<tr>
 			<c:forEach items="${genreList}" var="dto" begin="5" end="10">
+			<% 
+            ApiDTO dto1 = (ApiDTO)pageContext.getAttribute("dto");
+            Date date = inputFormat.parse(String.valueOf(dto1.getRelease_date()));
+		    String release_date = outputFormat.format(date);%>
 				<td>
 					<a href="detailed?movie_id=${dto.movie_id}" >
+					<div class="rating_age">
+									<c:choose>
+									 	<c:when test="${dto.rating_age eq '전체관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_all.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '12세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_12.png">
+									 	</c:when>
+									 	<c:when test="${dto.rating_age eq '15세이상관람가'}">
+									 		<img alt="관람등급" src="resources/images/age_15.png">
+									 	</c:when>
+									 	<c:otherwise>
+									 		<img alt="관람등급" src="resources/images/age_19.png">
+									 	</c:otherwise>
+									</c:choose>
+								</div>
 					<div class='inner_wrap'>
                            <div class="inner_text">
                                <span class="back"> <c:out value="${dto.synopsis }"></c:out> </span>
@@ -83,8 +130,10 @@
                                <img referrerpolicy="no-referrer" src="${dto.img_url}" alt="영화포스터" class="img" onerror="this.src='resources/images/noimg.jpg';">
                        </div>
                        <h3><a href="detailed?movie_id=${dto.movie_id}" ><c:out value="${dto.kor_title }"/></a></h3>
-                       <p>평점 <span class='score'>${dto.rating_star}</span></p>
-                       <p>개봉 <c:out value="${dto.release_date }"/></p>
+                       <p>평론가평점 <span class='score'>${dto.rating_star}</span> 유저평점 <span>${dto.star}</span></p>
+                       <p>국가 ${dto.country }</p>
+                       <p>러닝타임 ${dto.running_time}분</p>
+                       <p>개봉 <c:out value="<%=release_date%>"/></p>
 				</td>	
 			<%num++; %>
 			</c:forEach>

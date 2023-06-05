@@ -14,12 +14,21 @@
 	select count(*) from movie_table where genre like CONCAT('%', #{genre},'%')
 </select>
 
+<select id="selectMovie" resultType="apidto" parameterType = "int" >
+	select * from movie_table where movie_id = #{movieCd}
+</select>
+
+<select id="selectGrade" resultType="apidto" >
+	SELECT * FROM movie_table ORDER BY star DESC LIMIT 0, 10
+</select>						
+
 <select id="actionList" resultType="apidto" parameterType="int">
  select * from movie_table where genre like "%액션%" limit 
  <foreach collection="array" item="num" separator=",">
  #{num}
  </foreach>
 </select>
+
 <select id="comedyList" resultType="apidto" parameterType="int">
  select * from movie_table where genre like "%코미디%" limit 
  <foreach collection="array" item="num" separator=",">

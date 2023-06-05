@@ -1,5 +1,6 @@
 package dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -16,10 +17,12 @@ public class ApiDAO {
 	public int insertApi(ApiDTO dto) {
 		return session.insert("insertApi", dto);
 	}
+	public ApiDTO selectMovie(int movieCd) {
+		return session.selectOne("selectMovie", movieCd);
+	}
 	public int getTotalGenre(String genre) {
 		return session.selectOne("getTotalGenre",genre);
 	}
-
 	public List<ApiDTO> actionList(int[] limit){ 
 		return session.selectList("actionList", limit);
 	}
@@ -34,5 +37,8 @@ public class ApiDAO {
 	}
 	public List<ApiDTO> fantasyList(int[] limit){ 
 		return session.selectList("fantasyList", limit);
+	}
+	public List<ApiDTO> selectGrade(){ 
+		return session.selectList("selectGrade");
 	}
 }

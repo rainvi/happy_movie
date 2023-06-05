@@ -32,5 +32,4 @@ public class movieList {
 		request.setAttribute("result", result);
 	}
 	
-	
 }

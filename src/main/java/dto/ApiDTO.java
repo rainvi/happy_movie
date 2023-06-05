@@ -6,25 +6,28 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApiDTO {
-	String movie_id;
-	public String getMovie_id() {
+	
+	public int getMovie_id() {
 		return movie_id;
 	}
 
-	public void setMovie_id(String movie_id) {
+	public void setMovie_id(int movie_id) {
 		this.movie_id = movie_id;
 	}
 
-	String kor_title,eng_title,release_date;
+	int movie_id;
+	String kor_title,eng_title;
+	int release_date;
 	double rating_star;
 	int audiences,running_time;
 	String production,genre,country,rating_age,img_url,synopsis;
+	double star;
 	
 	ApiDTO(){}
 	
-	public ApiDTO(String movie_id, String kor_title, String eng_title, String release_date, double rating_star, int audiences,
+	public ApiDTO(int movie_id, String kor_title, String eng_title, int release_date, double rating_star, int audiences,
 			int running_time, String production, String genre, String country, String rating_age, String img_url,
-			String synopsis) {
+			String synopsis,double star) {
 		super();
 		this.movie_id = movie_id;
 		this.kor_title = kor_title;
@@ -39,6 +42,15 @@ public class ApiDTO {
 		this.rating_age = rating_age;
 		this.img_url = img_url;
 		this.synopsis = synopsis;
+		this.star = star;
+	}
+
+	public double getStar() {
+		return star;
+	}
+
+	public void setStar(int star) {
+		this.star = star;
 	}
 
 	public String getKor_title() {
@@ -53,18 +65,25 @@ public class ApiDTO {
 	public void setEng_title(String eng_title) {
 		this.eng_title = eng_title;
 	}
-	public String getRelease_date() {
+	public int getRelease_date() {
 		return release_date;
 	}
-	public void setRelease_date(String release_date) {
+	public void setRelease_date(int release_date) {
 		this.release_date = release_date;
 	}
+
 	public double getRating_star() {
 		return rating_star;
 	}
+
 	public void setRating_star(double rating_star) {
 		this.rating_star = rating_star;
 	}
+
+	public void setStar(double star) {
+		this.star = star;
+	}
+
 	public int getAudiences() {
 		return audiences;
 	}
