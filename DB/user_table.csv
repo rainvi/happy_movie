@@ -1,0 +1,14 @@
+user_id,pw,name,address,phone,email
+admin,admin,admin,admin,admin,admin
+gwon,6789,±ÇµµÇö,"ÄÚµù½Ã ÃÖ°íµ¿",01067896789,gwon@kakao.com
+hwang,1234,È²¼öºó,"ÀÚ¹Ù½Ã ½ºÇÁ¸µµ¿",01012341234,hwang@gmail.com
+member1,1111,±è¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01011111111,member1@m.com
+member2,2222,ÀÌ¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01022222222,member2@m.com
+member3,3333,¹Ú¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01033333333,member3@m.com
+member4,4444,ÃÖ¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01044444444,member4@m.com
+member5,5555,È²¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01055555555,member5@m.com
+member6,6666,¹®¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01066666666,member6@m.com
+member7,7777,±Ç¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01077777777,member7@m.com
+member8,8888,ÇÏ¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01088888888,member8@m.com
+member9,9999,¾È¸â¹ö,"¸â¹ö½Ã ¸â¹öµ¿",01099999999,member9@m.com
+moon,4567,¹®Á¤ºó,"ÇØÇÇ½Ã ¹«ºñµ¿",01045674567,moon@naver.com
